@@ -79,7 +79,7 @@ $('#minecraft-cache').click(function(e) {
     e.preventDefault();
     $.ajax({
         type: "GET",
-        url: "{{ URL::to('solder/cache-minecraft/') }}/",
+        url: "{{ URL::to('solder/cache-minecraft/') }}/", //TODO: Does not work in a proxied https environment. jquery still calls http which is blocked by the browser.
         success: function (data) {
             if (data.status == "success") {
                 console.log(data.reason);
