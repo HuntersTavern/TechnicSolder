@@ -3,19 +3,24 @@
 namespace App\Libraries;
 
 use Github\Client;
+use Illuminate\Support\Facades\Config;
 use RuntimeException;
 
 class UpdateUtils
 {
 
     public static $githubclient;
+    private static $org = 'technicpack';
+    private static $repo = 'technicsolder';
 
     public static function init()
     {
         $client = new Client();
         // TODO: Re-add caching (it got removed upstream)
         self::$githubclient = $client;
-
+        //Get Config for Org and Repo for updating
+        self::$org = Config::get('solder.github_org');
+        self::$repo = Config::get('solder.github_repo');
     }
 
     public static function getUpdateCheck()
@@ -48,7 +53,7 @@ class UpdateUtils
     {
 
         try {
-            return self::$githubclient->api('repo')->tags('technicpack', 'technicsolder');
+            return self::$githubclient->api('repo')->tags(self::$org, self::$repo);
         } catch (RuntimeException $e) {
             return ['error' => 'Unable to pull version from Github - ' . $e->getMessage()];
         }
@@ -63,7 +68,7 @@ class UpdateUtils
         }
 
         try {
-            return self::$githubclient->api('repo')->commits()->show('technicpack', 'technicsolder', $commit);
+            return self::$githubclient->api('repo')->commits()->show(self::$org, self::$repo, $commit);
         } catch (RuntimeException $e) {
             return ['error' => 'Unable to pull commit info from Github - ' . $e->getMessage()];
         }
@@ -74,7 +79,7 @@ class UpdateUtils
     {
 
         try {
-            return self::$githubclient->api('repo')->commits()->all('technicpack', 'technicsolder',
+            return self::$githubclient->api('repo')->commits()->all(self::$org, self::$repo,
                 ['sha' => $branch]);
         } catch (RuntimeException $e) {
             return ['error' => 'Unable to pull changelog from Github - ' . $e->getMessage()];

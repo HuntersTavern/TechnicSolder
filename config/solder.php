@@ -40,4 +40,19 @@ return [
      **/
     'md5_file_timeout' => intval(env('SOLDER_MD5_FILE_TIMEOUT', '30')),
 
+    /**
+     * Github Organisation
+     * 
+     * To make updating from different repositories easier, this has been implemented as a config val
+     */
+    'github_org' => env('SOLDER_GITHUB_ORG', 'technicpack'),
+
+    /**
+     * Github Repository
+     * 
+     * To make updating from different repositories easier, this has been implemented as a config val
+     * Second part
+     */
+    'github_repo' => env('SOLDER_GITHUB_REPO', 'technicsolder'),
+
 ];
