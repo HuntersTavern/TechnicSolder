@@ -76,7 +76,7 @@
               </li>
               <li>
                   <a href="#"><i class="fa fa-folder fa-fw"></i> Modpacks<span class="fa arrow"></span></a>
-                  <ul class="nav nav-second-level">
+                  <ul class="nav nav-second-level" {{ Request::is('modpack/*') ? ' class="mm-show"' : '' }}>
 
                        @foreach ($allModpacks as $modpack)
                         @if ($modpack->icon)
@@ -92,14 +92,14 @@
               </li>
               <li>
                   <a href="#"><i class="fa fa-book fa-fw"></i> Mod Library<span class="fa arrow"></span></a></a>
-                  <ul class="nav nav-second-level">
+                  <ul class="nav nav-second-level" {{ Request::is('mod/*') ? ' class="mm-show"' : '' }}>
                        <li><a href="{{ URL::to('mod/list') }}">Mod List</a></li>
                        <li><a href="{{ URL::to('mod/create') }}">Add a Mod</a></li>
                   </ul>
               </li>
               <li>
                   <a href="#"><i class="fa fa-wrench fa-fw"></i> Configure Solder<span class="fa arrow"></span></a>
-                  <ul class="nav nav-second-level">
+                  <ul class="nav nav-second-level" {{ Request::is('solder/*') ? ' class="mm-show"' : '' }}>
                       <li>
                           <a href="{{ URL::to('solder/configure') }}">Main Settings</a>
                       </li>
