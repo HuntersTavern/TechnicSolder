@@ -67,7 +67,7 @@
                     @endif               
                 </div>
                 <div class="text-right">
-                    <a href="https://github.com/TechnicPack/TechnicSolder/commits/master">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
+                    <a href="https://github.com/{{config('solder.github_org')}}/{{config('solder.github_repo')}}/commits/{{config('solder.github_branch')}}">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
         </div>
