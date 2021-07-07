@@ -7,23 +7,14 @@
     @show
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-    <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-migrate-3.0.0.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.jgrowl.min.js') }}"></script>
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('font-awesome/css/font-awesome.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/solder.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/metisMenu.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin.js') }}"></script>
-    <script src="{{ asset('js/datatables.min.js') }}"></script>
     <link href="{{ asset('css/jquery.jgrowl.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/jquery.slugify.js') }}"></script>
-    <script src="{{ asset('js/nav-float.js') }}"></script>
     <link href="{{ asset('css/OpenSansfont.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/solder.css') }}" rel="stylesheet">
     @yield('top')
   </head>
   <body>
@@ -132,6 +123,15 @@
     <!-- /.row -->
 </div>
 <!-- /#page-wrapper -->
+<script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
+<script src="{{ asset('js/jquery-migrate-3.0.0.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('js/jquery.jgrowl.min.js') }}"></script>
+<script src="{{ asset('js/metisMenu.min.js') }}"></script>
+<script src="{{ asset('js/sb-admin.js') }}"></script>
+<script src="{{ asset('js/datatables.min.js') }}"></script>
+<script src="{{ asset('js/jquery.slugify.js') }}"></script>
+<script src="{{ asset('js/nav-float.js') }}"></script>
 <script type="text/javascript">
     (function($){
         $(function(){
