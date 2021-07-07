@@ -55,4 +55,11 @@ return [
      */
     'github_repo' => env('SOLDER_GITHUB_REPO', 'technicsolder'),
 
+    /**
+     * Github Branch
+     * 
+     * Selects the Branch
+     */
+    'github_branch' => env('SOLDER_GITHUB_BRANCH', 'master'),
+
 ];

@@ -12,6 +12,7 @@ class UpdateUtils
     public static $githubclient;
     private static $org = 'technicpack';
     private static $repo = 'technicsolder';
+    private static $branch = 'master';
 
     public static function init()
     {
@@ -21,6 +22,7 @@ class UpdateUtils
         //Get Config for Org and Repo for updating
         self::$org = Config::get('solder.github_org');
         self::$repo = Config::get('solder.github_repo');
+        self::$branch = Config::get('solder.github_branch');
     }
 
     public static function getUpdateCheck()
@@ -75,12 +77,11 @@ class UpdateUtils
 
     }
 
-    public static function getLatestChangeLog($branch = 'master')
+    public static function getLatestChangeLog()
     {
 
         try {
-            return self::$githubclient->api('repo')->commits()->all(self::$org, self::$repo,
-                ['sha' => $branch]);
+            return self::$githubclient->api('repo')->commits()->all(self::$org, self::$repo, ['sha' => self::$branch]);
         } catch (RuntimeException $e) {
             return ['error' => 'Unable to pull changelog from Github - ' . $e->getMessage()];
         }
