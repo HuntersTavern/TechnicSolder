@@ -15,6 +15,7 @@
     <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/OpenSansfont.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dropzone.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dropzonebasic.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/solder.css') }}" rel="stylesheet">
     @yield('top')
   </head>
