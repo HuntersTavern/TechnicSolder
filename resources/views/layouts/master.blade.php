@@ -135,6 +135,7 @@
 <script src="{{ asset('js/jquery.slugify.js') }}"></script>
 <script src="{{ asset('js/nav-float.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.iframe-transport.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
 <!--Custom Scripts-->
