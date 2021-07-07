@@ -134,15 +134,17 @@
 <script src="{{ asset('js/datatables.min.js') }}"></script>
 <script src="{{ asset('js/jquery.slugify.js') }}"></script>
 <script src="{{ asset('js/nav-float.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
+<!--Custom Scripts-->
 <script type="text/javascript">
     (function($){
         $(function(){
             $.jGrowl.defaults.closerTemplate = '<div class="alert alert-info">Close All</div>';
         });
     })(jQuery);
-    </script>
+</script>
 @yield('bottom')
   </body>
 </html>
