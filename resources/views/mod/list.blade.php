@@ -4,14 +4,19 @@
 @stop
 @section('content')
 <div class="page-header">
-<h1>Mod Library</h1>
+	<h1>Mod Library</h1>
+</div>
+<div class="row">
+	<div class="col-12">
+		<form action="{{URL::to('/mod/upload')}}" class="dropzone" id="mod-file-upload"></form>
+	</div>
 </div>
 <div class="panel panel-default">
 	<div class="panel-heading">
-	<div class="pull-right">
-		<a href="{{ URL::to('mod/create') }}" class="btn btn-xs btn-success">Add Mod</a>
-	</div>
-	Mod List
+		<div class="pull-right">
+			<a href="{{ URL::to('mod/create') }}" class="btn btn-xs btn-success">Add Mod</a>
+		</div>
+		Mod List
 	</div>
 	<div class="panel-body">
 		@if (Session::has('success'))
