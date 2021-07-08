@@ -10,9 +10,9 @@
     <link href="{{ asset('assets/Bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/jQuery/css/jquery.jgrowl.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/sb-admin.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/sbAdminsb-admin.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/dataTables/datatables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/OpenSansfont.css') }}" rel="stylesheet">
     <link href="{{ asset('css/solder.css') }}" rel="stylesheet">
     @yield('top')
@@ -128,9 +128,9 @@
 <script src="{{ asset('assets/jQuery/js/jquery.jgrowl.min.js') }}"></script>
 <script src="{{ asset('assets/jQuery/js/jquery.slugify.js') }}"></script>
 <script src="{{ asset('assets/Bootstrap/js/bootstrap.min.js') }}"></script>
-<script src="{{ asset('js/metisMenu.min.js') }}"></script>
-<script src="{{ asset('js/sb-admin.js') }}"></script>
-<script src="{{ asset('js/datatables.min.js') }}"></script>
+<script src="{{ asset('assets/metisMenu/metisMenu.min.js') }}"></script>
+<script src="{{ asset('assets/sbAdmin/sb-admin.js') }}"></script>
+<script src="{{ asset('assets/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('js/nav-float.js') }}"></script>
 <!--Custom Scripts-->
 <script type="text/javascript">
