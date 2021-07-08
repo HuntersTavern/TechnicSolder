@@ -20,10 +20,10 @@
 	<div class="panel-body">
 		<div id="uploads"></div>
 		<div id="uploader">
-			<label for="file-upload" class="custom-file-upload">
-				<i class="fa fa-cloud-upload"></i>&nbsp;Drop your mods here
-			</label>
-			<input type="file" name="file" multiple>
+			<!--<label for="file-upload" class="custom-file-upload">
+				<i class="fa fa-cloud-upload"></i>&nbsp;Click to upload mods
+			</label>-->
+			<input type="file" name="file" id="modupload" multiple>
 		</div>
 	</div>
 </div>
@@ -88,6 +88,11 @@ $(document).ready(function() {
 	$('#dataTables').dataTable({
 		"order": [[ 1, "asc" ]]
 	});
+
+	/*$('.custom-file-upload').on('click', function(e){
+		$('#modupload').click();
+	});*/
+
 	$('input[type=file]').change(function(){
 
 		$(this).simpleUpload("/mod/upload", {
