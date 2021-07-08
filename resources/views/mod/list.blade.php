@@ -4,6 +4,10 @@
     <title>Mod Library - Technic Solder</title>
 @stop
 
+@section('top')
+<link href="{{asset('css/upload.css')}}" rel="stylesheet"/>
+@stop
+
 @section('content')
 <div class="page-header">
 	<h1>Mod Library</h1>
@@ -15,7 +19,12 @@
 	</div>
 	<div class="panel-body">
 		<div id="uploads"></div>
-		<input type="file" name="file" multiple>
+		<div id="uploader">
+			<label for="file-upload" class="custom-file-upload">
+				<i class="fa fa-cloud-upload"></i>&nbsp;Drop your mods here
+			</label>
+			<input type="file" name="file" multiple>
+		</div>
 	</div>
 </div>
 
