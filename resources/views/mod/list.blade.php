@@ -120,11 +120,11 @@
 @section('bottom')
 <script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.iframe-transport.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-process.js') }}"></script>
+<!--<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-process.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-image.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-audio.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-video.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-validate.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-validate.js') }}"></script>-->
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/init.js') }}"></script>
