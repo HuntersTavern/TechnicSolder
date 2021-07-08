@@ -153,7 +153,7 @@ class ModController extends Controller
     {
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
-        $ext = end(explode('.', $clientFilename));
+        //$ext = end(explode('.', $clientFilename));
         $filename = time().$clientFilename;
         Storage::disk('local')->putFileAs('public/'.$filename, $file, $filename);
         return response()->json([
@@ -161,7 +161,7 @@ class ModController extends Controller
             'error' => [
                 'message' => 'No error.'
             ],
-            'format' => $ext
+            'format' => 'bla'
         ]);
     }
 
