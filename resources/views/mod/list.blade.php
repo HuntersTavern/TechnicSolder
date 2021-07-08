@@ -81,7 +81,7 @@ $(document).ready(function() {
 	});
 	$('input[type=file]').change(function(){
 
-		$(this).simpleUpload("/ajax/upload.php?getFormat=1", {
+		$(this).simpleUpload("/mod/upload", {
 
 			allowedExts: ["jar","zip"],
 			allowedTypes: [
