@@ -148,7 +148,7 @@ class ModController extends Controller
         return redirect('mod/list')->with('success', 'Mod deleted!');
     }
 
-    public function postUpload(Request $request)
+    public function postUpload()
     {
         return response()->json([
             'status' => 'hello'
