@@ -4,9 +4,6 @@
     <title>Mod Library - Technic Solder</title>
 @stop
 
-@section('top')
-@stop
-
 @section('content')
 <div class="page-header">
 	<h1>Mod Library</h1>
@@ -75,7 +72,7 @@
 @endsection
 
 @section('bottom')
-<script src="{{{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}}}"></script>
+<script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#dataTables').dataTable({
