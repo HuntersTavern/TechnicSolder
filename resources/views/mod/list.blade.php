@@ -14,7 +14,8 @@
 		Upload Mods
 	</div>
 	<div class="panel-body">
-		<input type="file" name="file">
+		<div id="uploads"></div>
+		<input type="file" name="file" multiple>
 	</div>
 </div>
 
@@ -79,27 +80,77 @@ $(document).ready(function() {
 		"order": [[ 1, "asc" ]]
 	});
 	$('input[type=file]').change(function(){
-		$(this).simpleUpload("/mod/upload", {
+
+		$(this).simpleUpload("/ajax/upload.php?getFormat=1", {
+
+			allowedExts: ["jpg", "jpeg", "jpe", "jif", "jfif", "jfi", "png", "gif"],
+			allowedTypes: ["image/pjpeg", "image/jpeg", "image/png", "image/x-png", "image/gif", "image/x-gif"],
+			maxFileSize: 500000000, //500MB in bytes
 
 			start: function(file){
 				//upload started
-				console.log("upload started");
+
+				this.block = $('<div class="block"></div>');
+				this.progressBar = $('<div class="progressBar"></div>');
+				this.cancelButton = $('<div class="cancelButton">x</div>');
+
+				/*
+				* Since "this" differs depending on the function in which it is called,
+				* we need to assign "this" to a local variable to be able to access
+				* this.upload.cancel() inside another function call.
+				*/
+
+				var that = this;
+
+				this.cancelButton.click(function(){
+					that.upload.cancel();
+					//now, the cancel callback will be called
+				});
+
+				this.block.append(this.progressBar).append(this.cancelButton);
+				$('#uploads').append(this.block);
+
 			},
 
 			progress: function(progress){
 				//received progress
-				console.log("upload progress: " + Math.round(progress) + "%");
+				this.progressBar.width(progress + "%");
 			},
 
 			success: function(data){
 				//upload successful
-				console.log("upload successful!");
-				console.log(data);
+
+				this.progressBar.remove();
+				this.cancelButton.remove();
+
+				if (data.success) {
+					//now fill the block with the format of the uploaded file
+					var format = data.format;
+					var formatDiv = $('<div class="format"></div>').text(format);
+					this.block.append(formatDiv);
+				} else {
+					//our application returned an error
+					var error = data.error.message;
+					var errorDiv = $('<div class="error"></div>').text(error);
+					this.block.append(errorDiv);
+				}
+
 			},
 
 			error: function(error){
 				//upload failed
-				console.log("upload error: " + error.name + ": " + error.message);
+				this.progressBar.remove();
+				this.cancelButton.remove();
+				var error = error.message;
+				var errorDiv = $('<div class="error"></div>').text(error);
+				this.block.append(errorDiv);
+			},
+
+			cancel: function(){
+				//upload cancelled
+				this.block.fadeOut(400, function(){
+					$(this).remove();
+				});
 			}
 		});
 	});
