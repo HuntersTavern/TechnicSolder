@@ -7,6 +7,7 @@
 @section('top')
 <link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-ui.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css"/>
 <noscript>
 	<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-noscript.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-ui-noscript.css') }}" rel="stylesheet">
@@ -119,12 +120,16 @@
 
 @section('bottom')
 <script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
+<script src="https://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
+<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js"></script>
+<script src="https://blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js"></script>
+<script src="https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.iframe-transport.js') }}"></script>
-<!--<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-process.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-process.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-image.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-audio.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-video.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-validate.js') }}"></script>-->
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-validate.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
 <script src="{{ asset('assets/jQueryFileUpload/js/init.js') }}"></script>
