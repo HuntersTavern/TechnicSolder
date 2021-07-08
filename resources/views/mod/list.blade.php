@@ -5,13 +5,6 @@
 @stop
 
 @section('top')
-<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload.css') }}" rel="stylesheet">
-<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-ui.css') }}" rel="stylesheet">
-<link rel="stylesheet" href="https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css"/>
-<noscript>
-	<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-noscript.css') }}" rel="stylesheet">
-	<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-ui-noscript.css') }}" rel="stylesheet">
-</noscript>
 @stop
 
 @section('content')
@@ -24,44 +17,7 @@
 		Upload Mods
 	</div>
 	<div class="panel-body">
-		<form id="fileupload" action="/mod/upload" method="POST" enctype="multipart/form-data" >
-			<div class="row fileupload-buttonbar">
-				<div class="col-lg-7">
-					<span class="btn btn-success fileinput-button">
-						<i class="glyphicon glyphicon-plus"></i>
-						<span>Add files...</span>
-						<input type="file" name="files[]" multiple />
-					</span>
-					<button type="submit" class="btn btn-primary start">
-						<i class="glyphicon glyphicon-upload"></i>
-						<span>Start upload</span>
-					</button>
-					<button type="reset" class="btn btn-warning cancel">
-						<i class="glyphicon glyphicon-ban-circle"></i>
-						<span>Cancel upload</span>
-					</button>
-					<button type="button" class="btn btn-danger delete">
-						<i class="glyphicon glyphicon-trash"></i>
-						<span>Delete selected</span>
-					</button>
-					<input type="checkbox" class="toggle" />
-					<span class="fileupload-process"></span>
-				</div>
-				<!-- The global progress state -->
-				<div class="col-lg-5 fileupload-progress fade">
-					<!-- The global progress bar -->
-					<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" >
-						<div class="progress-bar progress-bar-success" style="width: 0%;" ></div>
-					</div>
-					<!-- The extended global progress state -->
-					<div class="progress-extended">&nbsp;</div>
-				</div>
-			</div>
-			<!-- The table listing the files available for upload/download -->
-			<table role="presentation" class="table table-striped">
-				<tbody class="files"></tbody>
-			</table>
-		</form>
+		<input type="file" name="file">
 	</div>
 </div>
 
@@ -119,24 +75,36 @@
 @endsection
 
 @section('bottom')
-<script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
-<script src="https://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
-<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js"></script>
-<script src="https://blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js"></script>
-<script src="https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.iframe-transport.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-process.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-image.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-audio.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-video.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-validate.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/init.js') }}"></script>
+<script src="{{{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}}}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#dataTables').dataTable({
 		"order": [[ 1, "asc" ]]
+	});
+	$('input[type=file]').change(function(){
+		$(this).simpleUpload("/mod/upload", {
+
+			start: function(file){
+				//upload started
+				console.log("upload started");
+			},
+
+			progress: function(progress){
+				//received progress
+				console.log("upload progress: " + Math.round(progress) + "%");
+			},
+
+			success: function(data){
+				//upload successful
+				console.log("upload successful!");
+				console.log(data);
+			},
+
+			error: function(error){
+				//upload failed
+				console.log("upload error: " + error.name + ": " + error.message);
+			}
+		});
 	});
 });
 </script>
