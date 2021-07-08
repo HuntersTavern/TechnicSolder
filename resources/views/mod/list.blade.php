@@ -83,8 +83,15 @@ $(document).ready(function() {
 
 		$(this).simpleUpload("/ajax/upload.php?getFormat=1", {
 
-			allowedExts: ["jpg", "jpeg", "jpe", "jif", "jfif", "jfi", "png", "gif"],
-			allowedTypes: ["image/pjpeg", "image/jpeg", "image/png", "image/x-png", "image/gif", "image/x-gif"],
+			allowedExts: ["jar","zip"],
+			allowedTypes: [
+				"application/java-archive",
+				"application/x-java-archive",
+				"application/x-jar",
+				"application/zip",
+				"application/octet-stream",
+				"application/x-zip-compressed"
+			],
 			maxFileSize: 500000000, //500MB in bytes
 
 			start: function(file){
