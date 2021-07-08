@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use ZipArchive;
 
 class ModController extends Controller
 {
@@ -153,15 +154,15 @@ class ModController extends Controller
     {
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
-        //$ext = end(explode('.', $clientFilename));
-        $filename = time().$clientFilename;
-        Storage::disk('local')->putFileAs('public/'.$filename, $file, $filename);
+        Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
+        $modInfo = $this->read_mod_info($clientFilename);
         return response()->json([
             'success' => true,
             'error' => [
                 'message' => 'No error.'
             ],
-            'format' => 'bla'
+            'format' => 'bla',
+            'modInfo' => $modInfo
         ]);
     }
 
@@ -378,5 +379,20 @@ class ModController extends Controller
         }
 
         return $hash;
+    }
+
+    private function read_mod_info($filename)
+    {
+        //Open as Zip file.
+        $zip = new ZipArchive;
+        $archive = $zip->open('/var/www/storage/modstmp/'.$filename);
+        if($archive) {
+            $manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE);
+            //get content (Will be in json):
+            $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
+            $mcmodInfo = json_decode($mcmodInfoContent);
+        }
+        $zip->close();
+        return $mcmodInfo;
     }
 }
