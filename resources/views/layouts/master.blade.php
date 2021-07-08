@@ -10,7 +10,7 @@
     <link href="{{ asset('assets/Bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/jQuery/css/jquery.jgrowl.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/sbAdminsb-admin.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/sbAdmin/sb-admin.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/dataTables/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/OpenSansfont.css') }}" rel="stylesheet">
