@@ -14,8 +14,6 @@
     <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/OpenSansfont.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-ui.css') }}" rel="stylesheet">
     <link href="{{ asset('css/solder.css') }}" rel="stylesheet">
     @yield('top')
   </head>
@@ -134,10 +132,6 @@
 <script src="{{ asset('js/datatables.min.js') }}"></script>
 <script src="{{ asset('js/jquery.slugify.js') }}"></script>
 <script src="{{ asset('js/nav-float.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.iframe-transport.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
-<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
 <!--Custom Scripts-->
 <script type="text/javascript">
     (function($){

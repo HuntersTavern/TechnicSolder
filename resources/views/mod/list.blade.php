@@ -1,7 +1,14 @@
 @extends('layouts/master')
+
 @section('title')
     <title>Mod Library - Technic Solder</title>
 @stop
+
+@section('top')
+<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/jQueryFileUpload/css/jquery.fileupload-ui.css') }}" rel="stylesheet">
+@stop
+
 @section('content')
 <div class="page-header">
 	<h1>Mod Library</h1>
@@ -68,7 +75,18 @@
 	</div>
 </div>
 @endsection
+
 @section('bottom')
+<script src="{{ asset('assets/jQueryFileUpload/js/vendor/jquery.ui.widget.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.iframe-transport.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-process.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-image.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-audio.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-video.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-validate.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/jquery.fileupload-ui.js') }}"></script>
+<script src="{{ asset('assets/jQueryFileUpload/js/init.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#dataTables').dataTable({
