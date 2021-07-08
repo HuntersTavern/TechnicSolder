@@ -151,14 +151,17 @@ class ModController extends Controller
 
     public function postUpload()
     {
-        $file = Request::input('file');
-        Storage::disk('local')->put('test.txt', $file);
+        $file = Request::file('file');
+        $clientFilename = $file->getClientOriginalName();
+        $ext = end(explode('.', $clientFilename));
+        $filename = time().$clientFilename;
+        Storage::disk('local')->putFileAs('public/'.$filename, $file, $filename);
         return response()->json([
             'success' => true,
             'error' => [
                 'message' => 'No error.'
             ],
-            'format' => 'jpg'
+            'format' => $ext
         ]);
     }
 
