@@ -154,7 +154,7 @@ class ModController extends Controller
     {
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
-        Storage::disk('local')->putFileAs('public/mods/', $file, $clientFilename);
+        Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
         if(!$modInfo = $this->read_mod_info($clientFilename)) {
             return response()->json([
                 'success' => false,
@@ -163,6 +163,7 @@ class ModController extends Controller
                 ]
             ]);
         } else {
+            //create mod zip file! move to app/public/mods/modname-version.zip
             return response()->json([
                 'success' => true,
                 'error' => [
@@ -395,7 +396,7 @@ class ModController extends Controller
         //Open as Zip file.
         $zip = new ZipArchive;
         $mcmodInfo = false;
-        $res = $zip->open('/var/www/storage/app/public/mods/'.$filename, ZipArchive::RDONLY);
+        $res = $zip->open('/var/www/storage/app/modstmp/'.$filename, ZipArchive::RDONLY);
         if($res === TRUE) {
             $manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE);
             //get content (Will be in json):
