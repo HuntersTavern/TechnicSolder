@@ -385,13 +385,14 @@ class ModController extends Controller
     {
         //Open as Zip file.
         $zip = new ZipArchive;
-        if($zip->open('/var/www/storage/modstmp/'.$filename)) {
+        $res = $zip->open('/var/www/storage/app/modstmp/'.$filename, ZipArchive::RDONLY);
+        if($res === TRUE) {
             $manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE);
             //get content (Will be in json):
             $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
-            $zip->close();
             $mcmodInfo = json_decode($mcmodInfoContent);
         }
+        $zip->close();
         return $mcmodInfo;
     }
 }
