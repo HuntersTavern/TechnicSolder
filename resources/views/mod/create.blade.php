@@ -134,6 +134,7 @@
 		$('#uploads').children('tr').remove()
 		//Loop modInfos and readd them to table.
 		for (i=0;i<Object.keys(modInfos).length;i++) {
+			key = Object.keys(modInfos)[i];
 			modInfo = modInfos[i];
 			var formatFields = '<tr><td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td></tr>';
 			$('#uploads').append(formatFields);
