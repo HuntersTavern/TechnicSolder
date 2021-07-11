@@ -206,7 +206,7 @@ $(document).ready(function() {
 					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
 					this.row.append(formatFields);
 					if(modInfo == false || modInfo.length == 0) {
-						addModInfo(false, false, filename);
+						addModInfo(false, modInfo, filename);
 					} else {
 						addModInfo(true, modInfo);
 					}
