@@ -155,9 +155,11 @@ class ModController extends Controller
         Log::debug('Client is uploading a file.');
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
+        $ulFileTmpPath = 'modstmp/'.$clientFilename;
+        $ulFileFullTmpPath = '/var/www/storage/app/'.$ulFileTmpPath;
         Log::debug('Client uploaded file ' . $clientFilename);
         Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
-        Log::debug('Saved file as modstmp/'.$clientFilename);
+        Log::debug('Saved file as '.$ulFileTmpPath);
         if(!$modInfo = $this->read_mod_info($clientFilename)[0]) {
             Log::error('Could not read mod-info from ' . $clientFilename . '.');
             return response()->json([
@@ -183,9 +185,18 @@ class ModController extends Controller
         }
         //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
         $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
+        $newFileTempPath = 'modstmp/'.$newFileName;
+        $newFileFullTempPath = '/var/www/storage/app/'.$newFileTempPath;
+        $newFilePubPath = 'public/mods/'.$modInfo->modid.'/'.$newFileName;
+        $newFileFullPubPath = '/var/www/storage/app/'.$newFilePubPath;
         Log::debug('Creating new zip file as modstmp/' . $newFileName);
         $newZipFile = new ZipArchive;
-        $res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::CREATE);
+        //check if the file already exists. if yes, delete it.
+        if(Storage::exists($newFileTempPath)) {
+            //$res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
+            Storage::delete($newFileTempPath);
+        }
+        $res = $newZipFile->open($newFileFullTempPath, ZipArchive::CREATE);
         if($res !== TRUE) {
             //Could not create zipfile:
             Log::error('Could not create zipfile modstmp/' . $newFileName);
@@ -201,11 +212,11 @@ class ModController extends Controller
         }
         if($newZipFile->addEmptyDir('mods')) {
             //add the file now.
-            if($newZipFile->addFile('/var/www/storage/app/modstmp/'.$clientFilename, 'mods/'.$clientFilename)) {
+            if($newZipFile->addFile($ulFileFullTmpPath, 'mods/'.$clientFilename)) {
                 //Add successfull, close archive.
                 $newZipFile->close();
                 //now move new file.
-                Storage::move('modstmp/'.$newFileName, 'public/mods/'.$modInfo->modid.'/'.$newFileName);
+                Storage::move($newFileTempPath, $newFilePubPath);
 
                 //return proposed data for new mod, or add version?
                 return response()->json([
