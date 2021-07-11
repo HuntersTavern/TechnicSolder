@@ -133,10 +133,11 @@
 		//clear table children
 		$('#uploads').children('tr').remove()
 		//Loop modInfos and readd them to table.
-		modInfos.forEach(function(modInfo, modid) {
+		for (i=0;i<modInfos.length;i++) {
+			modInfo = modInfos[i];
 			var formatFields = '<tr><td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td></tr>';
 			$('#uploads').append(formatFields);
-		});
+		}
 	}
 
 	function confirmModUpload(modid) {
