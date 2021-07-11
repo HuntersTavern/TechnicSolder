@@ -57,12 +57,14 @@
 				<blockquote>/mods/<span class="modslug">[modslug]</span>/<br>
 					/mods/<span class="modslug">[modslug]</span>/<span class="modslug">[modslug]</span>-[version].zip
 				</blockquote>
+                <hr/>
                 <div id="uploader">
                     <!--<label for="file-upload" class="custom-file-upload">
                         <i class="fa fa-cloud-upload"></i>&nbsp;Click to upload mods
                     </label>-->
                     <input type="file" name="file" id="modupload" multiple>
                 </div>
+                <hr/>
                 <div id="uploads"></div>
 			</div>
 		</div>
@@ -140,7 +142,8 @@ $(document).ready(function() {
 				if (data.success) {
 					//now fill the block with the format of the uploaded file
 					var format = data.format;
-					var formatDiv = $('<div class="format"></div>').text(format);
+                    var modInfo = data.modInfo;
+					var formatDiv = $('<div class="block"><span>'+modInfo.name+'<code>'+modInfo.modid+'</code></span><small>'+modInfo.version+'</small><span>for Minecraft v</span><small>'+modInfo.mcversion+'</small><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div>');
 					this.block.append(formatDiv);
 				} else {
 					//our application returned an error
