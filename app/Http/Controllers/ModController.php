@@ -155,25 +155,63 @@ class ModController extends Controller
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
         Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
-        if(!$modInfo = $this->read_mod_info($clientFilename)) {
-            return response()->json([
-                'success' => false,
-                'error' => [
-                    'message' => 'Could not load mod info.'
-                ]
-            ]);
-        } else {
-            //create mod zip file! move to app/public/mods/modname-version.zip
+        if(!$modInfo = $this->read_mod_info($clientFilename)[0]) {
             return response()->json([
                 'success' => true,
+                'modInfo' => false,
                 'error' => [
-                    'message' => 'No error.'
+                    'message' => 'Could not load mod info.'
                 ],
-                'format' => 'bla',
-                'modInfo' => $modInfo
+                'format' => 'info-error'
             ]);
         }
-        
+        //validate info:
+        if(!$modInfo = $this->validate_mod_info($modInfo)) {
+            return response()->json([
+                'success' => true,
+                'modInfo' => false,
+                'error' => [
+                    'message' => 'Could not load mod info.'
+                ],
+                'format' => 'info-error'
+            ]); 
+        }
+        //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
+        $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
+        $newZipFile = new ZipArchive;
+        $res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
+        if($res === TRUE) {
+            //Add mods/ folder:
+            if($newZipFile->addEmptyDir('mods')) {
+                //add the file now.
+                if($newZipFile->addFile('/var/www/storage/app/modstmp/'.$clientFilename, 'mods/'.$clientFilename)) {
+                    //Add successfull, close archive.
+                    $newZipFile->close();
+                    //now move new file.
+                    Storage::move('modstmp/'.$newFileName, 'public/mods/'.$modInfo->modid.'/'.$newFileName);
+
+                    //return proposed data for new mod, or add version?
+                    return response()->json([
+                        'success' => true,
+                        'modInfo' => $modInfo,
+                        'error' => [
+                            'message' => 'No error.'
+                        ],
+                        'format' => 'jar',
+                    ]);
+                }
+            } else {
+                //could not create folder. what do?
+                return response()->json([
+                    'success' => false,
+                    'modInfo' => false,
+                    'error' => [
+                        'message' => 'Could not create mod folder.'
+                    ],
+                    'format' => 'zip-create-error'
+                ]); 
+            }
+        }
     }
 
     public function anyRehash()
@@ -405,5 +443,41 @@ class ModController extends Controller
         }
         $zip->close();
         return $mcmodInfo;
+    }
+
+    /**
+     * Validates and fills missing info according to: https://mcforge.readthedocs.io/en/1.13.x/gettingstarted/structuring/#keeping-your-code-clean-using-sub-packages
+     *
+     * @param [type] $modInfo
+     * @return object|boolean
+     */
+    private function validate_mod_info($modInfo)
+    {
+        $info = array();
+        //check if important infos are set and if not, set default value:
+        if(!isset($modInfo->modid)) {
+            return false; //without modid, the info is not really usable.
+        } else {
+            //generate mod slug:
+            $info['modid'] = Str::slug($modInfo->modid);
+        }
+        $info['name'] = $modInfo->name ?? 'no pretty name given.'; //pretty name. required
+        $info['description'] = $modInfo->description ?? 'no description given'; //description of the mod.
+        $info['version'] = $modInfo->version ?? 'no mod version given.'; //version of the mod
+        $info['mcversion'] = $modInfo->mcversion ?? 'no minecraft version given.'; //version of mc this version of the mod works on. ~ can be 1.12.x || 1.12.2  || 1.12.1-1.13.1 or any variation
+        $info['url'] = $modInfo->url ?? 'no url given.'; //shows url of author? OPTIONAL!
+        $info['updateUrl'] = $modInfo->updateUrl ?? 'no updateurl given.'; //link to a url with versions listed.
+        $info['updateJson'] = $modInfo->updateJson ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
+        $info['authorList'] = $modInfo->authorList ?? ['no author list provided.']; //Array of persons that authored this mod.
+        $info['credits'] = $modInfo->credits ?? 'no credits given.'; //credits? idk OPTIONAL!
+        $info['logoFile'] = $modInfo->logoFile ?? 'no logo file path provided.'; //If the author included an logo, it will be referenced here.
+        $info['screenshots'] = $modInfo->screenshots ?? ['no screenshot urls provided']; //Screenshots of the mod. OPTIONAL!
+        $info['parent'] = $modInfo->parent ?? 'no parent id provided'; //id of the parent mod. for example used in modular mods as Buildcraft or mekanism.
+        $info['useDependencyInformation'] = $modInfo->useDependencyInformation ?? false; //if true, the next three dependency args should be used.
+        $info['requiredMods'] = $modInfo->requiredMods ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash. 
+        $info['dependencies'] = $modInfo->dependencies ?? ['no dependencies provided']; //A list of modids. All of the listed mods will load before this one. If one is not present, nothing happens.
+        $info['dpendants'] = $modInfo->dpendants ?? ['no dependants provided.']; //A list of modids. All of the listed mods will load after this one. If one is not present, nothing happens.
+        //send filled info back
+        return (object)$info;
     }
 }
