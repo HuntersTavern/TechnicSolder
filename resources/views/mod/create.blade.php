@@ -83,6 +83,7 @@
 				</form>
 			</div>
 			<div class="modal-footer">
+				<button class="btn btn-success" onclick="modUpdate()" id="setValuesButton" value="changeme">Set / Update Values</button>
 			</div>
 		</div>
 	</div>
@@ -108,8 +109,21 @@
 		$('#author').val(modInfo.authorList.join());
 		$('#description').val(modInfo.description);
 		$('#link').val(modInfo.url);
+		$('#setValuesButton').val(modInfo.modid);
 		//Show modal:
 		$('#modInfoModal').modal({show:true});
+	}
+
+	function updateMod() {
+		//update the specified mod with values from modal
+		modid = $('#setValuesButton').val();
+		newModInfo = modInfos[modid]; //load old values.
+		newModInfo['modid'] = $('#name').val();
+		newModInfo['name'] = $('#pretty_name').val();
+		newModInfo['url'] = $('#link').val();
+		newModInfo['description'] = $('#description').val();
+		newModInfo['authorList'] = $('#author').val().split(',');
+		modInfos[modid] = newModInfo; //save new values.
 	}
 
 	function confirmModUpload(modid) {
