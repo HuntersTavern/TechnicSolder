@@ -74,7 +74,7 @@
 					</div>
 					<div class="form-group">
 						<label for="description">Description</label>
-						<textarea name="description" id="description" class="form-control" rows="5"></textarea>
+						<textarea class="form-control" name="description" id="description"  rows="5"></textarea>
 					</div>
 					<div class="form-group">
 						<label for="link">Mod Website</label>
@@ -105,15 +105,19 @@
 	}
 
 	function viewMod(modid) {
+		//Load mod info:
+		modInfo = modInfos[modid];
 		//load mods infos into form:
-
+		$('#pretty_name').val(modInfo.name);
+		$('#name').val(modInfo.modid);
+		$('#author').val(modInfo.authorList.join());
+		$('#description').innerHtml(modInfo.description);
+		$('#link').val(modInfo.url);
+		//Show modal:
+		$('#modInfoModal').modal({show:true});
 	}
 
 	function confirmModUpload(modid) {
-		//
-	}
-
-	function editModInfo(modid) {
 		//
 	}
 
