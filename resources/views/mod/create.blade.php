@@ -24,31 +24,8 @@
             @endforeach
             </div>
         @endif
-		<form method="post" action="{{ URL::to('mod/create') }}">
 		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-                    <label for="pretty_name">Mod Name</label>
-                    <input type="text" class="form-control" name="pretty_name" id="pretty_name">
-                </div>
-                <div class="form-group">
-                    <label for="name">Mod Slug</label>
-                    <input type="text" class="form-control" name="name" id="name">
-                </div>
-                <div class="form-group">
-                    <label for="author">Author</label>
-                    <input type="text" class="form-control" name="author" id="author">
-                </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea name="description" id="description" class="form-control" rows="5"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="link">Mod Website</label>
-                    <input type="text" class="form-control" name="link" id="link">
-                </div>
-			</div>
-			<div class="col-md-6">
+			<div class="col-12">
 				<p>
                     Good news! Solder now does file handling. Just drop your .jar (or .zip) files below and solder will handle the rest for you.<br/>
                     Sadly this has one limitation. If the Mods author did not provide a mcmod.info, you will still have to fill out the details of the mod.<br/>
@@ -77,10 +54,45 @@
 			</div>
 		</div>
 		{!! Html::link('mod/list/', 'Go Back', ['class' => 'btn btn-primary']) !!}
-		</form>
+	</div>
+</div>
+<div id="modInfoModal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 id="modInfoModal_Header">ModName</h4>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="form-group">
+						<label for="pretty_name">Mod Name</label>
+						<input type="text" class="form-control" name="pretty_name" id="pretty_name">
+					</div>
+					<div class="form-group">
+						<label for="name">Mod Slug</label>
+						<input type="text" class="form-control" name="name" id="name">
+					</div>
+					<div class="form-group">
+						<label for="author">Author</label>
+						<input type="text" class="form-control" name="author" id="author">
+					</div>
+					<div class="form-group">
+						<label for="description">Description</label>
+						<textarea name="description" id="description" class="form-control" rows="5"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="link">Mod Website</label>
+						<input type="text" class="form-control" name="link" id="link">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+			</div>
+		</div>
 	</div>
 </div>
 @endsection
+
 @section('bottom')
 <script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script>
