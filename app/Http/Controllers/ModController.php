@@ -150,6 +150,13 @@ class ModController extends Controller
         return redirect('mod/list')->with('success', 'Mod deleted!');
     }
 
+    /**
+     * Recieves an upload from user and saves it into an temp dir.
+     * Sends info from mcmod.info back to client.
+     * Client has to send a /mod/create or /mod/add-version request for every mod it uploaded.
+     *
+     * @return Response
+     */
     public function postUpload()
     {
         Log::debug('Client is uploading a file.');
@@ -182,66 +189,50 @@ class ModController extends Controller
                 ],
                 'format' => 'info-error'
             ]);
-        }
-        //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
-        $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
-        $newFileTempPath = 'modstmp/'.$newFileName;
-        $newFileFullTempPath = '/var/www/storage/app/'.$newFileTempPath;
-        $newFilePubPath = 'public/mods/'.$modInfo->modid.'/'.$newFileName;
-        $newFileFullPubPath = '/var/www/storage/app/'.$newFilePubPath;
-        Log::debug('Creating new zip file as modstmp/' . $newFileName);
-        $newZipFile = new ZipArchive;
-        //check if the file already exists. if yes, delete it.
-        if (Storage::exists($newFileTempPath)) {
-            //$res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
-            Storage::delete($newFileTempPath);
-        }
-        $res = $newZipFile->open($newFileFullTempPath, ZipArchive::CREATE);
-        if ($res !== true) {
-            //Could not create zipfile:
-            Log::error('Could not create zipfile modstmp/' . $newFileName);
-            return response()->json([
-                'success' => false,
-                'modInfo' => false,
-                'error' => [
-                    'message' => 'Could not create zip file.'
-                ],
-                'format' => 'zip-create-error'
-            ]);
-            //Add mods/ folder:
-        }
-        if ($newZipFile->addEmptyDir('mods')) {
-            //add the file now.
-            if ($newZipFile->addFile($ulFileFullTmpPath, 'mods/'.$clientFilename)) {
-                //Add successfull, close archive.
-                $newZipFile->close();
-                //now move new file.
-                if (Storage::exists($newFilePubPath)) {
-                    Storage::delete($newFilePubPath);
-                }
-                Storage::move($newFileTempPath, $newFilePubPath);
-
-                //return proposed data for new mod, or add version?
+        } else {
+            //mod has successfully uploaded and saved. mcmod.info has been located.
+            //Check if mod with same slug already exists:
+            $mod = Mod::find($modInfo->modid);
+            if (empty($mod)) {
+                //new mod
                 return response()->json([
                     'success' => true,
+                    'newMod' => true,
                     'modInfo' => $modInfo,
                     'error' => [
-                        'message' => 'No error.'
+                        'message' => ''
                     ],
-                    'format' => 'jar',
+                    'format' => 'jar'
                 ]);
+            } else {
+                //mod already exists.
+                //check version if supplied:
+                if (Modversion::where(['mod_id' => $modInfo->modid, 'version' => $modInfo->version])->count() > 0) {
+                    //Mod with same version already exists in db.
+                    return response()->json([
+                        'success' => true,
+                        'newMod' => false,
+                        'newVersion' => false,
+                        'modInfo' => $modInfo,
+                        'error' => [
+                            'message' => ''
+                        ],
+                        'format' => 'jar'
+                    ]);
+                } else {
+                    //Version not found.
+                    return response()->json([
+                        'success' => true,
+                        'newMod' => false,
+                        'newVersion' => true,
+                        'modInfo' => $modInfo,
+                        'error' => [
+                            'message' => ''
+                        ],
+                        'format' => 'jar'
+                    ]);
+                }
             }
-        } else {
-            Log::error('Could not create folder inside zip file: modstmp/'. $newFileName);
-            //could not create folder. what do?
-            return response()->json([
-                'success' => false,
-                'modInfo' => false,
-                'error' => [
-                    'message' => 'Could not create mod folder.'
-                ],
-                'format' => 'zip-create-error'
-            ]);
         }
     }
 
@@ -523,5 +514,47 @@ class ModController extends Controller
         $info['dpendants'] = $modInfo->dpendants ?? ['no dependants provided.']; //A list of modids. All of the listed mods will load after this one. If one is not present, nothing happens.
         //send filled info back
         return (object)$info;
+    }
+
+    private function createNewZippedModFile($ulFileFullTmpPath, $clientFilename, $modInfo) {
+        //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
+        $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
+        $newFileTempPath = 'modstmp/'.$newFileName;
+        $newFileFullTempPath = '/var/www/storage/app/'.$newFileTempPath;
+        $newFilePubPath = 'public/mods/'.$modInfo->modid.'/'.$newFileName;
+        $newFileFullPubPath = '/var/www/storage/app/'.$newFilePubPath;
+        Log::debug('Creating new zip file as modstmp/' . $newFileName);
+        $newZipFile = new ZipArchive;
+        //check if the file already exists. if yes, delete it.
+        if (Storage::exists($newFileTempPath)) {
+            //$res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
+            Storage::delete($newFileTempPath);
+        }
+        $res = $newZipFile->open($newFileFullTempPath, ZipArchive::CREATE);
+        if ($res !== true) {
+            //Could not create zipfile:
+            Log::error('Could not create zipfile modstmp/' . $newFileName);
+            return false;
+            //Add mods/ folder:
+        }
+        if ($newZipFile->addEmptyDir('mods')) {
+            //add the file now.
+            if ($newZipFile->addFile($ulFileFullTmpPath, 'mods/'.$clientFilename)) {
+                //Add successfull, close archive.
+                $newZipFile->close();
+                //now move new file.
+                if (Storage::exists($newFilePubPath)) {
+                    Storage::delete($newFilePubPath);
+                }
+                Storage::move($newFileTempPath, $newFilePubPath);
+
+                //return proposed data for new mod, or add version?
+                return true;
+            }
+        } else {
+            Log::error('Could not create folder inside zip file: modstmp/'. $newFileName);
+            //could not create folder. what do?
+            return false;
+        }
     }
 }
