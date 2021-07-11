@@ -94,14 +94,9 @@
 <script>
 	var modInfos = [];
 
-	function addModInfo(infoPresent, modInfo = [], uploadedFile = '') {
+	function addModInfo(modInfo = []) {
 		//add provided info to the modinfos arr.
-		if (infoPresent) {
-			modInfos[modInfo.modid] = modInfo;
-		} else {
-			//no modinfo was sent
-			modInfos[uploadedFile] = [];
-		}
+		modInfos[modInfo.modid] = modInfo;
 	}
 
 	function viewMod(modid) {
@@ -190,7 +185,6 @@ $(document).ready(function() {
 
 			success: function(data){
 				//upload successful
-
 				this.progressBar.remove();
 				this.cancelButton.remove();
 
@@ -203,20 +197,15 @@ $(document).ready(function() {
 						modInfo = [];
 						modInfo["name"] = filename; modInfo["modid"] = filename; modInfo["authorList"] = ['none', 'defined']; modInfo["description"] = ''; modInfo["url"] = '';
 					}
+					addModInfo(modInfo);
 					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
 					this.row.append(formatFields);
-					if(modInfo == false || modInfo.length == 0) {
-						addModInfo(false, modInfo, filename);
-					} else {
-						addModInfo(true, modInfo);
-					}
 				} else {
 					//our application returned an error
 					var error = data.error.message;
 					var errorDiv = $('<div class="error"></div>').text(error);
 					this.row.append(errorDiv);
 				}
-
 			},
 
 			error: function(error){
