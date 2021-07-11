@@ -111,7 +111,7 @@
 		$('#pretty_name').val(modInfo.name);
 		$('#name').val(modInfo.modid);
 		$('#author').val(modInfo.authorList.join());
-		$('#description').innerHtml(modInfo.description);
+		$('#description').val(modInfo.description);
 		$('#link').val(modInfo.url);
 		//Show modal:
 		$('#modInfoModal').modal({show:true});
@@ -195,7 +195,7 @@ $(document).ready(function() {
 					var format = data.format;
                     var modInfo = data.modInfo;
 					var modInfo = data.modInfo;
-					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div></td>');
+					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
 					this.row.append(formatFields);
 					if(data.modInfo == false) {
 						addModInfo(false, [], data.uploadedFile);
