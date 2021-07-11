@@ -76,25 +76,6 @@
 @endsection
 @section('bottom')
 <script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
-<script type="text/javascript">
-String.prototype.formatUnicorn = String.prototype.formatUnicorn || function () {
-    "use strict";
-    var str = this.toString();
-    if (arguments.length) {
-        var t = typeof arguments[0];
-        var key;
-        var args = ("string" === t || "number" === t) ?
-            Array.prototype.slice.call(arguments)
-            : arguments[0];
-
-        for (key in args) {
-            str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
-        }
-    }
-
-    return str;
-};
-</script>
 <script>
 	var modInfos = [];
 
@@ -180,7 +161,6 @@ $(document).ready(function() {
 			success: function(data){
 				//upload successful
 
-				var addTmpl = '<div class="block"><span>{prettyName}<code>{modid}</code></span>&nbsp;<small>v{modVersion}</small>&nbsp;<span>for Minecraft v</span><small>{mcVersion}</small>&nbsp;<div class="btn-group"><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div></div>';
 				this.progressBar.remove();
 				this.cancelButton.remove();
 
@@ -188,12 +168,8 @@ $(document).ready(function() {
 					//now fill the block with the format of the uploaded file
 					var format = data.format;
                     var modInfo = data.modInfo;
-					var formatDiv = addTmpl.formatUnicorn(
-						prettyName:modInfo.name,
-						modid:modInfo.modid,
-						modVersion:modInfo.version,
-						mcVersion:modInfo.mcVersion
-					);
+					var modInfo = data.modInfo;
+					var formatDiv = $('<div class="block"><span>'+modInfo.name+'<code>'+modInfo.modid+'</code></span><small>'+modInfo.version+'</small><span>for Minecraft v</span><small>'+modInfo.mcversion+'</small><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div>');
 					this.block.append(formatDiv);
 					addModInfo(modInfo);
 				} else {
