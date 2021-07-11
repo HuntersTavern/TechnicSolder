@@ -65,10 +65,17 @@
                     <input type="file" name="file" id="modupload" multiple>
                 </div>
                 <hr/>
-                <div id="uploads"></div>
+                <table id="uploads">
+					<thead>
+						<th>Mod</th>
+						<th>Slug</th>
+						<th>Mod-Version</th>
+						<th>Minecraft-Version</th>
+						<th>Actions</th>
+					</thead>
+				</table>
 			</div>
 		</div>
-		{!! Form::submit('Add Mod', ['class' => 'btn btn-success']) !!}
 		{!! Html::link('mod/list/', 'Go Back', ['class' => 'btn btn-primary']) !!}
 		</form>
 	</div>
@@ -79,14 +86,19 @@
 <script>
 	var modInfos = [];
 
-	function addModInfo(modInfo) {
+	function addModInfo(infoPresent, modInfo = [], uploadedFile = '') {
 		//add provided info to the modinfos arr.
-		modInfos[modInfo.modid] = modInfo;
-
+		if (infoPresent) {
+			modInfos[modInfo.modid] = modInfo;
+		} else {
+			//no modinfo was sent
+			modInfos[uploadedFile] = [];
+		}
 	}
 
 	function viewMod(modid) {
-		//
+		//load mods infos into form:
+
 	}
 
 	function confirmModUpload(modid) {
@@ -131,7 +143,7 @@ $(document).ready(function() {
 			start: function(file){
 				//upload started
 
-				this.block = $('<div class="block"></div>');
+				this.row = $('<tr class="modUpload"></tr>');
 				this.progressBar = $('<div class="progressBar"></div>');
 				this.cancelButton = $('<div class="cancelButton">x</div>');
 
@@ -148,8 +160,8 @@ $(document).ready(function() {
 					//now, the cancel callback will be called
 				});
 
-				this.block.append(this.progressBar).append(this.cancelButton);
-				$('#uploads').append(this.block);
+				this.row.append(this.progressBar).append(this.cancelButton);
+				$('#uploads').append(this.row);
 
 			},
 
@@ -169,14 +181,18 @@ $(document).ready(function() {
 					var format = data.format;
                     var modInfo = data.modInfo;
 					var modInfo = data.modInfo;
-					var formatDiv = $('<div class="block"><span>'+modInfo.name+'<code>'+modInfo.modid+'</code></span><small>'+modInfo.version+'</small><span>for Minecraft v</span><small>'+modInfo.mcversion+'</small><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div>');
-					this.block.append(formatDiv);
-					addModInfo(modInfo);
+					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></td>');
+					this.row.append(formatFields);
+					if(data.modInfo == false) {
+						addModInfo(false, [], data.uploadedFile);
+					} else {
+						addModInfo(true, modInfo);
+					}
 				} else {
 					//our application returned an error
 					var error = data.error.message;
 					var errorDiv = $('<div class="error"></div>').text(error);
-					this.block.append(errorDiv);
+					this.row.append(errorDiv);
 				}
 
 			},
