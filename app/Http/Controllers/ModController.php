@@ -473,10 +473,11 @@ class ModController extends Controller
         $mcmodInfo = [false];
         $res = $zip->open('/var/www/storage/app/modstmp/'.$filename, ZipArchive::RDONLY);
         if ($res === true) {
-            $manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE);
-            //get content (Will be in json):
-            $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
-            $mcmodInfo = json_decode($mcmodInfoContent);
+            if ($manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE)) {
+                //get content (Will be in json):
+                $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
+                $mcmodInfo = json_decode($mcmodInfoContent);
+            }
         }
         $zip->close();
         return $mcmodInfo;
