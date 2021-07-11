@@ -160,7 +160,7 @@ class ModController extends Controller
         Log::debug('Client uploaded file ' . $clientFilename);
         Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
         Log::debug('Saved file as '.$ulFileTmpPath);
-        if(!$modInfo = $this->read_mod_info($clientFilename)[0]) {
+        if (!$modInfo = $this->read_mod_info($clientFilename)[0]) {
             Log::error('Could not read mod-info from ' . $clientFilename . '.');
             return response()->json([
                 'success' => true,
@@ -172,7 +172,7 @@ class ModController extends Controller
             ]);
         }
         //validate info:
-        if(!$modInfo = $this->validate_mod_info($modInfo)) {
+        if (!$modInfo = $this->validateModInfo($modInfo)) {
             Log::warning($clientFilename . ' did not contain a mcmod.info file to read details out of.');
             return response()->json([
                 'success' => true,
@@ -181,7 +181,7 @@ class ModController extends Controller
                     'message' => 'Could not load mod info.'
                 ],
                 'format' => 'info-error'
-            ]); 
+            ]);
         }
         //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
         $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
@@ -192,12 +192,12 @@ class ModController extends Controller
         Log::debug('Creating new zip file as modstmp/' . $newFileName);
         $newZipFile = new ZipArchive;
         //check if the file already exists. if yes, delete it.
-        if(Storage::exists($newFileTempPath)) {
+        if (Storage::exists($newFileTempPath)) {
             //$res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
             Storage::delete($newFileTempPath);
         }
         $res = $newZipFile->open($newFileFullTempPath, ZipArchive::CREATE);
-        if($res !== TRUE) {
+        if ($res !== true) {
             //Could not create zipfile:
             Log::error('Could not create zipfile modstmp/' . $newFileName);
             return response()->json([
@@ -210,9 +210,9 @@ class ModController extends Controller
             ]);
             //Add mods/ folder:
         }
-        if($newZipFile->addEmptyDir('mods')) {
+        if ($newZipFile->addEmptyDir('mods')) {
             //add the file now.
-            if($newZipFile->addFile($ulFileFullTmpPath, 'mods/'.$clientFilename)) {
+            if ($newZipFile->addFile($ulFileFullTmpPath, 'mods/'.$clientFilename)) {
                 //Add successfull, close archive.
                 $newZipFile->close();
                 //now move new file.
@@ -238,7 +238,7 @@ class ModController extends Controller
                     'message' => 'Could not create mod folder.'
                 ],
                 'format' => 'zip-create-error'
-            ]); 
+            ]);
         }
     }
 
@@ -479,11 +479,11 @@ class ModController extends Controller
      * @param [type] $modInfo
      * @return object|boolean
      */
-    private function validate_mod_info($modInfo)
+    private function validateModInfo($modInfo)
     {
         $info = array();
         //check if important infos are set and if not, set default value:
-        if(!isset($modInfo->modid)) {
+        if (!isset($modInfo->modid)) {
             return false; //without modid, the info is not really usable.
         } else {
             //generate mod slug:
@@ -497,7 +497,7 @@ class ModController extends Controller
         $info['updateUrl'] = $modInfo->updateUrl ?? 'no updateurl given.'; //link to a url with versions listed.
         $info['updateJson'] = $modInfo->updateJson ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
         $info['authorList'] = $modInfo->authorList ?? ['no author list provided.']; //Array of persons that authored this mod.
-        if(!isset($modInfo->authorList) && isset($modInfo->authors)) {
+        if (!isset($modInfo->authorList) && isset($modInfo->authors)) {
             $info['authorList'] = $modInfo->authors; //many authors use this instead of the official way.
         }
         $info['credits'] = $modInfo->credits ?? 'no credits given.'; //credits? idk OPTIONAL!
@@ -505,9 +505,9 @@ class ModController extends Controller
         $info['screenshots'] = $modInfo->screenshots ?? ['no screenshot urls provided']; //Screenshots of the mod. OPTIONAL!
         $info['parent'] = $modInfo->parent ?? 'no parent id provided'; //id of the parent mod. for example used in modular mods as Buildcraft or mekanism.
         $info['useDependencyInformation'] = $modInfo->useDependencyInformation ?? false; //if true, the next three dependency args should be used.
-        $info['requiredMods'] = $modInfo->requiredMods ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash. 
+        $info['requiredMods'] = $modInfo->requiredMods ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash.
         $info['dependencies'] = $modInfo->dependencies ?? ['no dependencies provided']; //A list of modids. All of the listed mods will load before this one. If one is not present, nothing happens.
-        if(!isset($modInfo->dependencies) && isset($modInfo->dependancies)) {
+        if (!isset($modInfo->dependencies) && isset($modInfo->dependancies)) {
             $info['dependencies'] = $modInfo->dependancies; //spelling mistake. observed in ichuns backtools v4.0.0 (default mod included in solder.)
         }
         $info['dpendants'] = $modInfo->dpendants ?? ['no dependants provided.']; //A list of modids. All of the listed mods will load after this one. If one is not present, nothing happens.
