@@ -486,6 +486,9 @@ class ModController extends Controller
         $info['updateUrl'] = $modInfo->updateUrl ?? 'no updateurl given.'; //link to a url with versions listed.
         $info['updateJson'] = $modInfo->updateJson ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
         $info['authorList'] = $modInfo->authorList ?? ['no author list provided.']; //Array of persons that authored this mod.
+        if(!isset($modInfo->authorList) && isset($modInfo->authors)) {
+            $info['authorList'] = $modInfo->authors; //many authors use this instead of the official way.
+        }
         $info['credits'] = $modInfo->credits ?? 'no credits given.'; //credits? idk OPTIONAL!
         $info['logoFile'] = $modInfo->logoFile ?? 'no logo file path provided.'; //If the author included an logo, it will be referenced here.
         $info['screenshots'] = $modInfo->screenshots ?? ['no screenshot urls provided']; //Screenshots of the mod. OPTIONAL!
@@ -493,6 +496,9 @@ class ModController extends Controller
         $info['useDependencyInformation'] = $modInfo->useDependencyInformation ?? false; //if true, the next three dependency args should be used.
         $info['requiredMods'] = $modInfo->requiredMods ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash. 
         $info['dependencies'] = $modInfo->dependencies ?? ['no dependencies provided']; //A list of modids. All of the listed mods will load before this one. If one is not present, nothing happens.
+        if(!isset($modInfo->dependencies) && isset($modInfo->dependancies)) {
+            $info['dependencies'] = $modInfo->dependancies; //spelling mistake. observed in ichuns backtools v4.0.0 (default mod included in solder.)
+        }
         $info['dpendants'] = $modInfo->dpendants ?? ['no dependants provided.']; //A list of modids. All of the listed mods will load after this one. If one is not present, nothing happens.
         //send filled info back
         return (object)$info;
