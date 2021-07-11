@@ -212,6 +212,15 @@ class ModController extends Controller
                 ]); 
             }
         }
+        //Could not create zipfile:
+        return response()->json([
+            'success' => false,
+            'modInfo' => false,
+            'error' => [
+                'message' => 'Could not create zip file.'
+            ],
+            'format' => 'zip-create-error'
+        ]); 
     }
 
     public function anyRehash()
