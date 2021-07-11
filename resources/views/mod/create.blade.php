@@ -95,6 +95,30 @@ String.prototype.formatUnicorn = String.prototype.formatUnicorn || function () {
     return str;
 };
 </script>
+<script>
+	var modInfos = [];
+
+	function addModInfo(modInfo) {
+		//add provided info to the modinfos arr.
+		modInfos[modInfo.modid] = modInfo;
+	}
+
+	function viewMod(modid) {
+		//
+	}
+
+	function confirmModUpload(modid) {
+		//
+	}
+
+	function editModInfo(modid) {
+		//
+	}
+
+	function cancelModUpload(modid) {
+		//
+	}
+</script>
 <script type="text/javascript">
 $("#name").slugify('#pretty_name');
 $(".modslug").slugify("#pretty_name");
@@ -171,6 +195,7 @@ $(document).ready(function() {
 						mcVersion
 					);
 					this.block.append(formatDiv);
+					addModInfo(modInfo);
 				} else {
 					//our application returned an error
 					var error = data.error.message;
