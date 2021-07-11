@@ -1,7 +1,13 @@
 @extends('layouts/master')
+
 @section('title')
     <title>Create Mod - Technic Solder</title>
 @stop
+
+@section('top')
+<link href="{{asset('css/upload.css')}}" rel="stylesheet"/>
+@stop
+
 @section('content')
 <div class="page-header">
 <h1>Mod Library</h1>
@@ -43,10 +49,21 @@
                 </div>
 			</div>
 			<div class="col-md-6">
-				<p>Because Solder doesn't do any file handling yet you will need to manually manage your set of mods in your repository. The mod repository structure is very strict and must match your Solder data exact. An example of your mod directory structure will be listed below:</p>
+				<p>
+                    Good news! Solder now does file handling. Just drop your .jar (or .zip) files below and solder will handle the rest for you.<br/>
+                    Sadly this has one limitation. If the Mods author did not provide a mcmod.info, you will still have to fill out the details of the mod.<br/>
+                    The following structure will be kept:<br/>
+                </p>
 				<blockquote>/mods/<span class="modslug">[modslug]</span>/<br>
 					/mods/<span class="modslug">[modslug]</span>/<span class="modslug">[modslug]</span>-[version].zip
 				</blockquote>
+                <div id="uploader">
+                    <!--<label for="file-upload" class="custom-file-upload">
+                        <i class="fa fa-cloud-upload"></i>&nbsp;Click to upload mods
+                    </label>-->
+                    <input type="file" name="file" id="modupload" multiple>
+                </div>
+                <div id="uploads"></div>
 			</div>
 		</div>
 		{!! Form::submit('Add Mod', ['class' => 'btn btn-success']) !!}
@@ -56,11 +73,101 @@
 </div>
 @endsection
 @section('bottom')
+<script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script type="text/javascript">
 $("#name").slugify('#pretty_name');
 $(".modslug").slugify("#pretty_name");
 $("#name").keyup(function() {
 	$(".modslug").html($(this).val());
+});
+
+$(document).ready(function() {
+	/*$('.custom-file-upload').on('click', function(e){
+		$('#modupload').click();
+	});*/
+
+	$('input[type=file]').change(function(){
+
+		$(this).simpleUpload("/mod/upload", {
+
+			allowedExts: ["jar","zip"],
+			allowedTypes: [
+				"application/java-archive",
+				"application/x-java-archive",
+				"application/x-jar",
+				"application/zip",
+				"application/octet-stream",
+				"application/x-zip-compressed"
+			],
+			maxFileSize: 500000000, //500MB in bytes
+
+			start: function(file){
+				//upload started
+
+				this.block = $('<div class="block"></div>');
+				this.progressBar = $('<div class="progressBar"></div>');
+				this.cancelButton = $('<div class="cancelButton">x</div>');
+
+				/*
+				* Since "this" differs depending on the function in which it is called,
+				* we need to assign "this" to a local variable to be able to access
+				* this.upload.cancel() inside another function call.
+				*/
+
+				var that = this;
+
+				this.cancelButton.click(function(){
+					that.upload.cancel();
+					//now, the cancel callback will be called
+				});
+
+				this.block.append(this.progressBar).append(this.cancelButton);
+				$('#uploads').append(this.block);
+
+			},
+
+			progress: function(progress){
+				//received progress
+				this.progressBar.width(progress + "%");
+			},
+
+			success: function(data){
+				//upload successful
+
+				this.progressBar.remove();
+				this.cancelButton.remove();
+
+				if (data.success) {
+					//now fill the block with the format of the uploaded file
+					var format = data.format;
+					var formatDiv = $('<div class="format"></div>').text(format);
+					this.block.append(formatDiv);
+				} else {
+					//our application returned an error
+					var error = data.error.message;
+					var errorDiv = $('<div class="error"></div>').text(error);
+					this.block.append(errorDiv);
+				}
+
+			},
+
+			error: function(error){
+				//upload failed
+				this.progressBar.remove();
+				this.cancelButton.remove();
+				var error = error.message;
+				var errorDiv = $('<div class="error"></div>').text(error);
+				this.block.append(errorDiv);
+			},
+
+			cancel: function(){
+				//upload cancelled
+				this.block.fadeOut(400, function(){
+					$(this).remove();
+				});
+			}
+		});
+	});
 });
 </script>
 @endsection

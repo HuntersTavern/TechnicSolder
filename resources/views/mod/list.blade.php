@@ -4,28 +4,9 @@
     <title>Mod Library - Technic Solder</title>
 @stop
 
-@section('top')
-<link href="{{asset('css/upload.css')}}" rel="stylesheet"/>
-@stop
-
 @section('content')
 <div class="page-header">
 	<h1>Mod Library</h1>
-</div>
-
-<div class="panel panel-default">
-	<div class="panel-heading">
-		Upload Mods
-	</div>
-	<div class="panel-body">
-		<div id="uploads"></div>
-		<div id="uploader">
-			<!--<label for="file-upload" class="custom-file-upload">
-				<i class="fa fa-cloud-upload"></i>&nbsp;Click to upload mods
-			</label>-->
-			<input type="file" name="file" id="modupload" multiple>
-		</div>
-	</div>
 </div>
 
 <div class="panel panel-default">
@@ -82,98 +63,10 @@
 @endsection
 
 @section('bottom')
-<script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#dataTables').dataTable({
 		"order": [[ 1, "asc" ]]
-	});
-
-	/*$('.custom-file-upload').on('click', function(e){
-		$('#modupload').click();
-	});*/
-
-	$('input[type=file]').change(function(){
-
-		$(this).simpleUpload("/mod/upload", {
-
-			allowedExts: ["jar","zip"],
-			allowedTypes: [
-				"application/java-archive",
-				"application/x-java-archive",
-				"application/x-jar",
-				"application/zip",
-				"application/octet-stream",
-				"application/x-zip-compressed"
-			],
-			maxFileSize: 500000000, //500MB in bytes
-
-			start: function(file){
-				//upload started
-
-				this.block = $('<div class="block"></div>');
-				this.progressBar = $('<div class="progressBar"></div>');
-				this.cancelButton = $('<div class="cancelButton">x</div>');
-
-				/*
-				* Since "this" differs depending on the function in which it is called,
-				* we need to assign "this" to a local variable to be able to access
-				* this.upload.cancel() inside another function call.
-				*/
-
-				var that = this;
-
-				this.cancelButton.click(function(){
-					that.upload.cancel();
-					//now, the cancel callback will be called
-				});
-
-				this.block.append(this.progressBar).append(this.cancelButton);
-				$('#uploads').append(this.block);
-
-			},
-
-			progress: function(progress){
-				//received progress
-				this.progressBar.width(progress + "%");
-			},
-
-			success: function(data){
-				//upload successful
-
-				this.progressBar.remove();
-				this.cancelButton.remove();
-
-				if (data.success) {
-					//now fill the block with the format of the uploaded file
-					var format = data.format;
-					var formatDiv = $('<div class="format"></div>').text(format);
-					this.block.append(formatDiv);
-				} else {
-					//our application returned an error
-					var error = data.error.message;
-					var errorDiv = $('<div class="error"></div>').text(error);
-					this.block.append(errorDiv);
-				}
-
-			},
-
-			error: function(error){
-				//upload failed
-				this.progressBar.remove();
-				this.cancelButton.remove();
-				var error = error.message;
-				var errorDiv = $('<div class="error"></div>').text(error);
-				this.block.append(errorDiv);
-			},
-
-			cancel: function(){
-				//upload cancelled
-				this.block.fadeOut(400, function(){
-					$(this).remove();
-				});
-			}
-		});
 	});
 });
 </script>
