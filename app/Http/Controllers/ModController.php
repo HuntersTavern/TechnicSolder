@@ -160,7 +160,7 @@ class ModController extends Controller
         Log::debug('Client uploaded file ' . $clientFilename);
         Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
         Log::debug('Saved file as '.$ulFileTmpPath);
-        if (!$modInfo = $this->read_mod_info($clientFilename)[0]) {
+        if (!$modInfo = $this->readModInfo($clientFilename)[0]) {
             Log::error('Could not read mod-info from ' . $clientFilename . '.');
             return response()->json([
                 'success' => true,
@@ -460,13 +460,19 @@ class ModController extends Controller
         return $hash;
     }
 
-    private function read_mod_info($filename)
+    /**
+     * Reads the mcmod.info file from a provided .jar file.
+     *
+     * @param [type] $filename
+     * @return array
+     */
+    private function readModInfo($filename)
     {
         //Open as Zip file.
         $zip = new ZipArchive;
-        $mcmodInfo = false;
+        $mcmodInfo = [false];
         $res = $zip->open('/var/www/storage/app/modstmp/'.$filename, ZipArchive::RDONLY);
-        if($res === TRUE) {
+        if ($res === true) {
             $manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE);
             //get content (Will be in json):
             $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
