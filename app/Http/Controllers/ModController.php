@@ -216,6 +216,9 @@ class ModController extends Controller
                 //Add successfull, close archive.
                 $newZipFile->close();
                 //now move new file.
+                if (Storage::exists($newFilePubPath)) {
+                    Storage::delete($newFilePubPath);
+                }
                 Storage::move($newFileTempPath, $newFilePubPath);
 
                 //return proposed data for new mod, or add version?
