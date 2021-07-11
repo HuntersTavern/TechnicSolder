@@ -107,12 +107,15 @@
 	function viewMod(modid) {
 		//Load mod info:
 		modInfo = modInfos[modid];
+		if(modInfo == false) {
+			modInfo.name = ''; modInfo.modid = ''; modInfo.authorList = []; modInfo.description = ''; modInfo.url = '';
+		}
 		//load mods infos into form:
-		$('#pretty_name').val(modInfo.name || '');
-		$('#name').val(modInfo.modid || '');
-		$('#author').val(modInfo.authorList.join() || '');
-		$('#description').val(modInfo.description || '');
-		$('#link').val(modInfo.url || '');
+		$('#pretty_name').val(modInfo.name);
+		$('#name').val(modInfo.modid);
+		$('#author').val(modInfo.authorList.join());
+		$('#description').val(modInfo.description);
+		$('#link').val(modInfo.url);
 		//Show modal:
 		$('#modInfoModal').modal({show:true});
 	}
@@ -195,10 +198,13 @@ $(document).ready(function() {
 					var format = data.format;
                     var modInfo = data.modInfo;
 					var modInfo = data.modInfo;
-					var formatFields = $('<td>'+modInfo.name || data.uploadedFile+'</td><td>'+modInfo.modid || data.uploadedFile+'</td><td>'+modInfo.version || data.uploadedFile+'</td><td>'+modInfo.mcversion || data.uploadedFile+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid || data.uploadedFile+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid || data.uploadedFile+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid || data.uploadedFile+'\')">Cancel</button></div></td>');
+					if(modInfo == false) {
+						modInfo.name = modInfo.uploadedFile; modInfo.modid = modInfo.uploadedFile; modInfo.authorList = []; modInfo.description = ''; modInfo.url = '';
+					}
+					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
 					this.row.append(formatFields);
 					if(data.modInfo == false) {
-						addModInfo(false, [], data.uploadedFile);
+						addModInfo(false, false, data.uploadedFile);
 					} else {
 						addModInfo(true, modInfo);
 					}
