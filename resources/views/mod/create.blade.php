@@ -107,9 +107,6 @@
 	function viewMod(modid) {
 		//Load mod info:
 		modInfo = modInfos[modid];
-		if(modInfo == false || modInfo.length == 0) {
-			modInfo.name = ''; modInfo.modid = ''; modInfo.authorList = []; modInfo.description = ''; modInfo.url = '';
-		}
 		//load mods infos into form:
 		$('#pretty_name').val(modInfo.name);
 		$('#name').val(modInfo.modid);
@@ -136,7 +133,11 @@ $("#name").keyup(function() {
 });
 
 $(document).ready(function() {
-	$('#uploads').dataTable({});
+	$('#uploads').dataTable({
+		language:{
+			"zeroRecords":" "
+		}
+	});
 
 	/*$('.custom-file-upload').on('click', function(e){
 		$('#modupload').click();
@@ -197,13 +198,15 @@ $(document).ready(function() {
 					//now fill the block with the format of the uploaded file
 					var format = data.format;
                     var modInfo = data.modInfo;
+					var filename = data.uploadedFile;
 					if(modInfo == false || modInfo.length == 0) {
-						modInfo.name = data.uploadedFile; modInfo.modid = data.uploadedFile; modInfo.authorList = []; modInfo.description = ''; modInfo.url = '';
+						modInfo = [];
+						modInfo.["name"] = filename; modInfo.["modid"] = filename; modInfo.["authorList"] = []; modInfo.["description"] = ''; modInfo.["url"] = '';
 					}
 					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
 					this.row.append(formatFields);
 					if(modInfo == false || modInfo.length == 0) {
-						addModInfo(false, false, data.uploadedFile);
+						addModInfo(false, false, filename);
 					} else {
 						addModInfo(true, modInfo);
 					}
