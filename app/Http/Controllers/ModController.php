@@ -185,7 +185,7 @@ class ModController extends Controller
         $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
         Log::debug('Creating new zip file as modstmp/' . $newFileName);
         $newZipFile = new ZipArchive;
-        $res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
+        $res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::CREATE, ZipArchive::OVERWRITE);
         if($res !== TRUE) {
             //Could not create zipfile:
             Log::error('Could not create zipfile modstmp/' . $newFileName);
