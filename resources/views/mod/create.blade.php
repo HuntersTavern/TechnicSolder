@@ -24,35 +24,31 @@
             @endforeach
             </div>
         @endif
-		<div class="row">
-			<div class="col-12">
-				<p>
-                    Good news! Solder now does file handling. Just drop your .jar (or .zip) files below and solder will handle the rest for you.<br/>
-                    Sadly this has one limitation. If the Mods author did not provide a mcmod.info, you will still have to fill out the details of the mod.<br/>
-                    The following structure will be kept:<br/>
-                </p>
-				<blockquote>/mods/<span class="modslug">[modslug]</span>/<br>
-					/mods/<span class="modslug">[modslug]</span>/<span class="modslug">[modslug]</span>-[version].zip
-				</blockquote>
-                <hr/>
-                <div id="uploader">
-                    <!--<label for="file-upload" class="custom-file-upload">
-                        <i class="fa fa-cloud-upload"></i>&nbsp;Click to upload mods
-                    </label>-->
-                    <input type="file" name="file" id="modupload" multiple>
-                </div>
-                <hr/>
-                <table id="uploads" class="table table-striped table-hover">
-					<thead>
-						<th>Mod</th>
-						<th>Slug</th>
-						<th>Mod-Version</th>
-						<th>Minecraft-Version</th>
-						<th>Actions</th>
-					</thead>
-				</table>
-			</div>
+		<p>
+			Good news! Solder now does file handling. Just drop your .jar (or .zip) files below and solder will handle the rest for you.<br/>
+			Sadly this has one limitation. If the Mods author did not provide a mcmod.info, you will still have to fill out the details of the mod.<br/>
+			The following structure will be kept:<br/>
+		</p>
+		<blockquote>/mods/<span class="modslug">[modslug]</span>/<br>
+			/mods/<span class="modslug">[modslug]</span>/<span class="modslug">[modslug]</span>-[version].zip
+		</blockquote>
+		<hr/>
+		<div id="uploader">
+			<!--<label for="file-upload" class="custom-file-upload">
+				<i class="fa fa-cloud-upload"></i>&nbsp;Click to upload mods
+			</label>-->
+			<input type="file" name="file" id="modupload" multiple>
 		</div>
+		<hr/>
+		<table id="uploads" class="table table-striped table-hover">
+			<thead>
+				<th>Mod</th>
+				<th>Slug</th>
+				<th>Mod-Version</th>
+				<th>Minecraft-Version</th>
+				<th>Actions</th>
+			</thead>
+		</table>
 		{!! Html::link('mod/list/', 'Go Back', ['class' => 'btn btn-primary']) !!}
 	</div>
 </div>
