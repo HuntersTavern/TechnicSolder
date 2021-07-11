@@ -42,7 +42,7 @@
                     <input type="file" name="file" id="modupload" multiple>
                 </div>
                 <hr/>
-                <table id="uploads">
+                <table id="uploads" class="table table-striped table-hover">
 					<thead>
 						<th>Mod</th>
 						<th>Slug</th>
