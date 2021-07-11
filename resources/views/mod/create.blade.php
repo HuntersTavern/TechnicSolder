@@ -143,7 +143,7 @@ $(document).ready(function() {
 					//now fill the block with the format of the uploaded file
 					var format = data.format;
                     var modInfo = data.modInfo;
-					var formatDiv = $('<div class="block"><span>'+modInfo.name+'<code>'+modInfo.modid+'</code></span><small>'+modInfo.version+'</small><span>for Minecraft v</span><small>'+modInfo.mcversion+'</small><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div>');
+					var formatDiv = $('<div class="block"><span>'+modInfo.name+'<code>'+modInfo.modid+'</code></span>&nbsp;<small>v'+modInfo.version+'</small>&nbsp;<span>for Minecraft v</span><small>'+modInfo.mcversion+'</small>&nbsp;<div class="btn-group"><button class="btn btn-sm btn-info">View</button><button class="btn btn-sm btn-success">Confirm</button><button class="btn btn-sm btn-primary">Change</button><button class="btn btn-sm btn-danger">Cancel</button></div></div>');
 					this.block.append(formatDiv);
 				} else {
 					//our application returned an error
