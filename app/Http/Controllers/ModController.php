@@ -152,10 +152,14 @@ class ModController extends Controller
 
     public function postUpload()
     {
+        Log::debug('Client is uploading a file.');
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
+        Log::debug('Client uploaded file ' . $clientFilename);
         Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
+        Log::debug('Saved file as modstmp/'.$clientFilename);
         if(!$modInfo = $this->read_mod_info($clientFilename)[0]) {
+            Log::error('Could not read mod-info from ' . $clientFilename . '.');
             return response()->json([
                 'success' => true,
                 'modInfo' => false,
@@ -167,6 +171,7 @@ class ModController extends Controller
         }
         //validate info:
         if(!$modInfo = $this->validate_mod_info($modInfo)) {
+            Log::warning($clientFilename . ' did not contain a mcmod.info file to read details out of.');
             return response()->json([
                 'success' => true,
                 'modInfo' => false,
@@ -178,49 +183,52 @@ class ModController extends Controller
         }
         //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
         $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
+        Log::debug('Creating new zip file as modstmp/' . $newFileName);
         $newZipFile = new ZipArchive;
         $res = $newZipFile->open('/var/www/storage/app/modstmp/'.$newFileName, ZipArchive::OVERWRITE);
-        if($res === TRUE) {
+        if($res !== TRUE) {
+            //Could not create zipfile:
+            Log::error('Could not create zipfile modstmp/' . $newFileName);
+            return response()->json([
+                'success' => false,
+                'modInfo' => false,
+                'error' => [
+                    'message' => 'Could not create zip file.'
+                ],
+                'format' => 'zip-create-error'
+            ]);
             //Add mods/ folder:
-            if($newZipFile->addEmptyDir('mods')) {
-                //add the file now.
-                if($newZipFile->addFile('/var/www/storage/app/modstmp/'.$clientFilename, 'mods/'.$clientFilename)) {
-                    //Add successfull, close archive.
-                    $newZipFile->close();
-                    //now move new file.
-                    Storage::move('modstmp/'.$newFileName, 'public/mods/'.$modInfo->modid.'/'.$newFileName);
-
-                    //return proposed data for new mod, or add version?
-                    return response()->json([
-                        'success' => true,
-                        'modInfo' => $modInfo,
-                        'error' => [
-                            'message' => 'No error.'
-                        ],
-                        'format' => 'jar',
-                    ]);
-                }
-            } else {
-                //could not create folder. what do?
-                return response()->json([
-                    'success' => false,
-                    'modInfo' => false,
-                    'error' => [
-                        'message' => 'Could not create mod folder.'
-                    ],
-                    'format' => 'zip-create-error'
-                ]); 
-            }
         }
-        //Could not create zipfile:
-        return response()->json([
-            'success' => false,
-            'modInfo' => false,
-            'error' => [
-                'message' => 'Could not create zip file.'
-            ],
-            'format' => 'zip-create-error'
-        ]); 
+        if($newZipFile->addEmptyDir('mods')) {
+            //add the file now.
+            if($newZipFile->addFile('/var/www/storage/app/modstmp/'.$clientFilename, 'mods/'.$clientFilename)) {
+                //Add successfull, close archive.
+                $newZipFile->close();
+                //now move new file.
+                Storage::move('modstmp/'.$newFileName, 'public/mods/'.$modInfo->modid.'/'.$newFileName);
+
+                //return proposed data for new mod, or add version?
+                return response()->json([
+                    'success' => true,
+                    'modInfo' => $modInfo,
+                    'error' => [
+                        'message' => 'No error.'
+                    ],
+                    'format' => 'jar',
+                ]);
+            }
+        } else {
+            Log::error('Could not create folder inside zip file: modstmp/'. $newFileName);
+            //could not create folder. what do?
+            return response()->json([
+                'success' => false,
+                'modInfo' => false,
+                'error' => [
+                    'message' => 'Could not create mod folder.'
+                ],
+                'format' => 'zip-create-error'
+            ]); 
+        }
     }
 
     public function anyRehash()
