@@ -40,7 +40,7 @@
 			<input type="file" name="file" id="modupload" multiple>
 		</div>
 		<hr/>
-		<table id="uploads" class="table table-striped table-hover">
+		<table class="table table-striped table-hover">
 			<thead>
 				<th>Mod</th>
 				<th>Slug</th>
@@ -48,6 +48,8 @@
 				<th>Minecraft-Version</th>
 				<th>Actions</th>
 			</thead>
+			<tbody id="uploads">
+			</tbody>
 		</table>
 		{!! Html::link('mod/list/', 'Go Back', ['class' => 'btn btn-primary']) !!}
 	</div>
@@ -83,7 +85,7 @@
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-success" onclick="modUpdate()" id="setValuesButton" value="changeme">Set / Update Values</button>
+				<button class="btn btn-success" onclick="updateMod()" id="setValuesButton" value="changeme">Set / Update Values</button>
 			</div>
 		</div>
 	</div>
@@ -124,6 +126,17 @@
 		newModInfo['description'] = $('#description').val();
 		newModInfo['authorList'] = $('#author').val().split(',');
 		modInfos[modid] = newModInfo; //save new values.
+		//Redraw table:
+	}
+
+	function redrawTable() {
+		//clear table children
+		$('#uploads').children('tbody').children('tr').remove()
+		//Loop modInfos and readd them to table.
+		modInfos.forEach(function(modInfo, modid) {
+			var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
+			$('#uploads')
+		});
 	}
 
 	function confirmModUpload(modid) {
@@ -142,11 +155,6 @@ $("#name").keyup(function() {
 });
 
 $(document).ready(function() {
-	$('#uploads').dataTable({
-		language:{
-			"zeroRecords":" "
-		}
-	});
 
 	/*$('.custom-file-upload').on('click', function(e){
 		$('#modupload').click();
@@ -212,8 +220,7 @@ $(document).ready(function() {
 						modInfo["name"] = filename; modInfo["modid"] = filename; modInfo["authorList"] = ['none', 'defined']; modInfo["description"] = ''; modInfo["url"] = '';
 					}
 					addModInfo(modInfo);
-					var formatFields = $('<td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td>');
-					this.row.append(formatFields);
+					redrawTable();
 				} else {
 					//our application returned an error
 					var error = data.error.message;
