@@ -101,6 +101,7 @@ String.prototype.formatUnicorn = String.prototype.formatUnicorn || function () {
 	function addModInfo(modInfo) {
 		//add provided info to the modinfos arr.
 		modInfos[modInfo.modid] = modInfo;
+
 	}
 
 	function viewMod(modid) {
@@ -191,8 +192,7 @@ $(document).ready(function() {
 						prettyName:modInfo.name,
 						modid:modInfo.modid,
 						modVersion:modInfo.version,
-						mcVersion:modInfo.
-						mcVersion
+						mcVersion:modInfo.mcVersion
 					);
 					this.block.append(formatDiv);
 					addModInfo(modInfo);
