@@ -164,73 +164,53 @@ class ModController extends Controller
         $clientFilename = $file->getClientOriginalName();
         $ulFileTmpPath = 'modstmp/'.$clientFilename;
         $ulFileFullTmpPath = '/var/www/storage/app/'.$ulFileTmpPath;
+        $resArr = [
+            //default values:
+            'success' => false,
+            'newMod' => false,
+            'newVersion' => false,
+            'modInfo' => false,
+            'uploadedFile' => $clientFilename,
+            'error' => [
+                'message' => ''
+            ],
+            'format' => 'jar'
+        ];
         Log::debug('Client uploaded file ' . $clientFilename);
         Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
         Log::debug('Saved file as '.$ulFileTmpPath);
+        $resArr['success'] = true; //mod was uploaded successfully
+
         if (!$modInfo = $this->readModInfo($clientFilename)[0]) {
             Log::error('Could not read mod-info from ' . $clientFilename . '.');
-            return response()->json([
-                'success' => true,
-                'modInfo' => false,
-                'error' => [
-                    'message' => 'Could not load mod info.'
-                ],
-                'format' => 'info-error'
-            ]);
+            $resArr['error']['message'] = 'Could not load mod Info.';
+            return response()->json($resArr);
         }
+
         //validate info:
         if (!$modInfo = $this->validateModInfo($modInfo)) {
             Log::warning($clientFilename . ' did not contain a mcmod.info file to read details out of.');
-            return response()->json([
-                'success' => true,
-                'modInfo' => false,
-                'error' => [
-                    'message' => 'Could not load mod info.'
-                ],
-                'format' => 'info-error'
-            ]);
+            $resArr['error']['message'] = 'Validation of mcmod.info failed.';
+            return response()->json($resArr);
         } else {
             //mod has successfully uploaded and saved. mcmod.info has been located.
+            $resArr['modInfo'] = $modInfo;
             //Check if mod with same slug already exists:
             $mod = Mod::find($modInfo->modid);
             if (empty($mod)) {
                 //new mod
-                return response()->json([
-                    'success' => true,
-                    'newMod' => true,
-                    'modInfo' => $modInfo,
-                    'error' => [
-                        'message' => ''
-                    ],
-                    'format' => 'jar'
-                ]);
+                $resArr['newMod'] = true;
+                return response()->json($resArr);
             } else {
                 //mod already exists.
                 //check version if supplied:
                 if (Modversion::where(['mod_id' => $modInfo->modid, 'version' => $modInfo->version])->count() > 0) {
                     //Mod with same version already exists in db.
-                    return response()->json([
-                        'success' => true,
-                        'newMod' => false,
-                        'newVersion' => false,
-                        'modInfo' => $modInfo,
-                        'error' => [
-                            'message' => ''
-                        ],
-                        'format' => 'jar'
-                    ]);
+                    return response()->json($resArr);
                 } else {
                     //Version not found.
-                    return response()->json([
-                        'success' => true,
-                        'newMod' => false,
-                        'newVersion' => true,
-                        'modInfo' => $modInfo,
-                        'error' => [
-                            'message' => ''
-                        ],
-                        'format' => 'jar'
-                    ]);
+                    $resArr['newVersion'] = true;
+                    return response()->json($resArr);
                 }
             }
         }
@@ -516,7 +496,8 @@ class ModController extends Controller
         return (object)$info;
     }
 
-    private function createNewZippedModFile($ulFileFullTmpPath, $clientFilename, $modInfo) {
+    private function createNewZippedModFile($ulFileFullTmpPath, $clientFilename, $modInfo)
+    {
         //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
         $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
         $newFileTempPath = 'modstmp/'.$newFileName;
