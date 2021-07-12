@@ -86,6 +86,8 @@
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-success" onclick="updateMod()" id="setValuesButton" value="changeme">Set / Update Values</button>
+				<button class="btn btn-success" onclick="confirmModUpload()" id="confirmUploadButton" value="changeme">Confirm Upload</button>
+				<button class="btn btn-danger" onclick="cancelModUpload()" id="cancelUploadButton" value="changeme">Cancel Upload</button>
 			</div>
 		</div>
 	</div>
@@ -112,6 +114,8 @@
 		$('#description').val(modInfo.description);
 		$('#link').val(modInfo.url);
 		$('#setValuesButton').val(modInfo.modid);
+		$('#confirmUploadButton').val(modInfo.modid);
+		$('#cancelUploadButton').val(modInfo.modid);
 		//Show modal:
 		$('#modInfoModal').modal({show:true});
 	}
@@ -126,7 +130,7 @@
 		newModInfo['description'] = $('#description').val();
 		newModInfo['authorList'] = $('#author').val().split(',');
 		modInfos[modid] = newModInfo; //save new values.
-		//Redraw table:
+		redrawTable();
 	}
 
 	function redrawTable() {
@@ -141,12 +145,17 @@
 		}
 	}
 
-	function confirmModUpload(modid) {
-		//
+	function confirmModUpload(modid = 0) {
+		if(modid == 0) {
+			//get value from button:
+			modid = $('#confirmUploadButton').val();
+		}
 	}
 
-	function cancelModUpload(modid) {
-		//
+	function cancelModUpload(modid = 0) {
+		if(modid == 0) {
+			modid = $('#cancelUploadButton').val();
+		}
 	}
 </script>
 <script type="text/javascript">
