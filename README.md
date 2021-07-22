@@ -30,6 +30,7 @@ Requirements
 * PDO PHP Extension
 * Tokenizer PHP Extension
 * XML PHP Extension
+* ZIP PHP Extension
 * A MySQL or PostgreSQL database
 
 Installation/Updating Solder
