@@ -55,7 +55,16 @@ class ModController extends Controller
 
     public function getCreate()
     {
-        return view('mod.create');
+        //gather all known mod slugs, to display select box:
+        $mods = Mod::with(
+            [
+                'versions' => function ($query) {
+                    $query->orderBy('modversions.updated_at', 'desc');
+                }
+            ]
+        )
+            ->get();
+        return view('mod.create')->with(['mods' => $mods]);
     }
 
     public function postCreate()

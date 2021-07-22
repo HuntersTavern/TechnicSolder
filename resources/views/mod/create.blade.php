@@ -68,7 +68,17 @@
 					</div>
 					<div class="form-group">
 						<label for="name">Mod Slug</label>
-						<input type="text" class="form-control" name="name" id="name">
+						<input type="text" class="form-control" name="name-new" id="name-new">
+					</div>
+					<div class="form-group">
+						<label for="name">Add to Existing mod:</label>
+						<select class="form-control" name="name" id="name">
+							@foreach ($mods as $mod)
+								@php
+									var_dump($mod);
+								@endphp
+							@endforeach
+						</select>
 					</div>
 					<div class="form-group">
 						<label for="author">Author</label>
@@ -109,7 +119,7 @@
 		modInfo = modInfos[modid];
 		//load mods infos into form:
 		$('#pretty_name').val(modInfo.name);
-		$('#name').val(modInfo.modid);
+		$('#name-new').val(modInfo.modid);
 		$('#author').val(modInfo.authorList.join());
 		$('#description').val(modInfo.description);
 		$('#link').val(modInfo.url);
