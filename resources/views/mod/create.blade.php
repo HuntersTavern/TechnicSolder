@@ -75,7 +75,7 @@
 						<select class="form-control" name="name" id="name">
 							@foreach ($mods as $mod)
 								@php $atts = $mod["attributes"]; @endphp
-								<option value="{{$atts["name"]}}">{{$atts["pretty_name"]}}</option>
+								<option value="">{{$atts}}</option>
 							@endforeach
 						</select>
 					</div>
