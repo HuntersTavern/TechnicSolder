@@ -133,6 +133,7 @@
 		//update the specified mod with values from modal
 		modid = $('#setValuesButton').val();
 		newModInfo = modInfos[modid]; //load old values.
+		delete modInfos[modid]; //remove infos from array, will be set again at the end.
 		modid = $('#name-new').val(); //update key
 		newModInfo['modid'] = $('#name-new').val();
 		newModInfo['name'] = $('#pretty_name').val();
@@ -159,24 +160,25 @@
 		if(modid == 0) {
 			//get value from button:
 			modid = $('#confirmUploadButton').val();
-			//new mod or new version?
-			if($('#name').val() == 0) {
-				//new mod. use slug from #name-new
-				new_modid = $('#name-new').val();
-			} else {
-				//new version for mod with id "modid"
-			}
-			//send request to server to do 
 		}
+		//new mod or new version?
+		if($('#name').val() == 0) {
+			//new mod. use slug from #name-new
+			new_modid = $('#name-new').val();
+		} else {
+			//new version for mod with id "modid"
+		}
+		//send request to server to do 
 	}
 
 	function cancelModUpload(modid = 0) {
 		if(modid == 0) {
 			modid = $('#cancelUploadButton').val();
-			//remove from list, redraw table.
-			delete modInfos[modid];
-			redrawTable();
 		}
+		//remove from list, redraw table.
+		delete modInfos[modid];
+		$('#modInfoModal').modal({show:false});
+		redrawTable();
 	}
 </script>
 <script type="text/javascript">
