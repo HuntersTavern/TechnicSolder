@@ -74,8 +74,7 @@
 						<label for="name">Add to Existing mod:</label>
 						<select class="form-control" name="name" id="name">
 							@foreach ($mods as $mod)
-								@php $atts = $mod["attributes"]; @endphp
-								<option value="">{{$atts}}</option>
+								<option value="{{$mod->name}}">{{$mod->pretty_name}}</option>
 							@endforeach
 						</select>
 					</div>
