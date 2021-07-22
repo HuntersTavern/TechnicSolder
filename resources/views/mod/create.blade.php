@@ -74,6 +74,7 @@
 						<label for="name">Add to Existing mod:</label>
 						<select class="form-control" name="name" id="name">
 							@foreach ($mods as $mod)
+								<option value="0" selected>No, create new Mod</option>
 								<option value="{{$mod->name}}">{{$mod->pretty_name}}</option>
 							@endforeach
 						</select>
@@ -132,7 +133,7 @@
 		//update the specified mod with values from modal
 		modid = $('#setValuesButton').val();
 		newModInfo = modInfos[modid]; //load old values.
-		newModInfo['modid'] = $('#name').val();
+		newModInfo['modid'] = $('#name-new').val();
 		newModInfo['name'] = $('#pretty_name').val();
 		newModInfo['url'] = $('#link').val();
 		newModInfo['description'] = $('#description').val();
