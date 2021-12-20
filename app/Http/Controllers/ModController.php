@@ -60,8 +60,39 @@ class ModController extends Controller
         return view('mod.create')->with(['mods' => $mods]);
     }
 
+    /**
+     * This confirms the upload and creates a zip with the correct format inside the storage/app/public/repo folder
+     *
+     * @return void
+     */
+    public function postUploadConfirm()
+    {
+        Log::debug("Confirming Upload");
+        $rules = [
+            'filename' => 'required',
+            'modid' => 'required',
+            'modversion' => 'required'
+        ];
+        $messages = [
+            'filename.required' => 'The filename is required.',
+            'modid.required' => 'The Mod-ID is required.',
+            'modversion.required' => 'The Mod-Version is required'
+        ];
+        $validation = Validator::make(Request::all(), $rules, $messages);
+        if ($validation->fails()) {
+            Log::debug("Confirmation failed because of the following validation errors" . json_encode($validation->messages()));
+            return response()->json(['status' => "error", 'reason' => 'check your inputs.', 'errors' => $validation->messages()]);
+        } else {
+            $filename = Request::input('filename');
+            $modid = Request::input('modid');
+            $modversion = Request::input('modversion');
+            $this->createNewZippedModFile($filename, $modid, $modversion); //TODO: Move file to new folder.
+        }
+    }
+
     public function postCreate()
     {
+        Log::debug("Creating new mod");
         $rules = [
             'name' => 'required|unique:mods',
             'pretty_name' => 'required',
@@ -76,7 +107,9 @@ class ModController extends Controller
 
         $validation = Validator::make(Request::all(), $rules, $messages);
         if ($validation->fails()) {
-            return redirect('mod/create')->withErrors($validation->messages());
+            Log::debug("Creation failed because of the following validation errors" . json_encode($validation->messages()));
+            //return redirect('mod/create')->withErrors($validation->messages());
+            return response()->json(['status' => "error", 'reason' => 'check your inputs.', 'errors' => $validation->messages()]); //dont lose uploads
         }
 
         $mod = new Mod();
@@ -86,7 +119,8 @@ class ModController extends Controller
         $mod->description = Request::input('description');
         $mod->link = Request::input('link');
         $mod->save();
-        return redirect('mod/view/' . $mod->id);
+        Log::debug("Successfully saved the new Mod as ".$mod->name);
+        return response()->json(['status' => 'success', 'data' => ['id' => $mod->id]]);
     }
 
     public function getDelete($mod_id = null)
@@ -165,7 +199,7 @@ class ModController extends Controller
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
         $ulFileTmpPath = 'modstmp/'.$clientFilename;
-        $ulFileFullTmpPath = '/var/www/storage/app/'.$ulFileTmpPath;
+        $ulFileFullTmpPath = storage_path().'/app/'.$ulFileTmpPath;
         $resArr = [
             //default values:
             'success' => false,
@@ -183,7 +217,7 @@ class ModController extends Controller
         Log::debug('Saved file as '.$ulFileTmpPath);
         $resArr['success'] = true; //mod was uploaded successfully
 
-        if (!$modInfo = $this->readModInfo($clientFilename)[0]) {
+        if (!$modInfo = $this->readModInfo($clientFilename)) {
             Log::error('Could not read mod-info from ' . $clientFilename . '.');
             $resArr['error']['message'] = 'Could not load mod Info.';
             return response()->json($resArr);
@@ -437,22 +471,24 @@ class ModController extends Controller
      * Reads the mcmod.info file from a provided .jar file.
      *
      * @param [type] $filename
-     * @return array
+     * @return array|bool
      */
     private function readModInfo($filename)
     {
         //Open as Zip file.
         $zip = new ZipArchive;
         $mcmodInfo = [false];
-        $res = $zip->open('/var/www/storage/app/modstmp/'.$filename, ZipArchive::RDONLY);
+        $res = $zip->open(storage_path().'/app/modstmp/'.$filename, ZipArchive::RDONLY);
         if ($res === true) {
             if ($manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE)) {
                 //get content (Will be in json):
                 $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
                 $mcmodInfo = json_decode($mcmodInfoContent);
             }
+            $zip->close();
+        } else {
+            $mcmodInfo = false;
         }
-        $zip->close();
         return $mcmodInfo;
     }
 
@@ -465,6 +501,30 @@ class ModController extends Controller
     private function validateModInfo($modInfo)
     {
         $info = array();
+        /**
+         * Check which type of mcmod.info this is.
+         *
+         * Known types:
+         * [{modList->[{infos}]}]
+         * {infos}
+         * {pack->{infos}}
+         */
+        Log::debug("ModInfo: ".json_encode($modInfo));
+        if (is_array($modInfo)) {
+            if (is_object($modInfo[0])) {
+                $modInfo = $modInfo[0];
+            }
+        }
+        if (is_object($modInfo)) {
+            if (isset($modInfo->modList)) {
+                if (is_array($modInfo->modList)) {
+                    $modInfo = $modInfo->modList[0];
+                }
+            }
+            if (isset($modInfo->pack)) {
+                $modInfo = $modInfo->pack;
+            }
+        }
         //check if important infos are set and if not, set default value:
         if (!isset($modInfo->modid)) {
             return false; //without modid, the info is not really usable.
@@ -476,8 +536,8 @@ class ModController extends Controller
         $info['description'] = $modInfo->description ?? 'no description given'; //description of the mod.
         $info['version'] = $modInfo->version ?? 'no mod version given.'; //version of the mod
         $info['mcversion'] = $modInfo->mcversion ?? 'no minecraft version given.'; //version of mc this version of the mod works on. ~ can be 1.12.x || 1.12.2  || 1.12.1-1.13.1 or any variation
-        $info['url'] = $modInfo->url ?? 'no url given.'; //shows url of author? OPTIONAL!
-        $info['updateUrl'] = $modInfo->updateUrl ?? 'no updateurl given.'; //link to a url with versions listed.
+        $info['url'] = $modInfo->url ?? ''; //shows url of author? OPTIONAL!
+        $info['updateUrl'] = $modInfo->updateUrl ?? ''; //link to a url with versions listed.
         $info['updateJson'] = $modInfo->updateJson ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
         $info['authorList'] = $modInfo->authorList ?? ['no author list provided.']; //Array of persons that authored this mod.
         if (!isset($modInfo->authorList) && isset($modInfo->authors)) {
@@ -498,14 +558,22 @@ class ModController extends Controller
         return (object)$info;
     }
 
-    private function createNewZippedModFile($ulFileFullTmpPath, $clientFilename, $modInfo)
+    /**
+     * Creates the Version-Archive and moves it to the repo.
+     *
+     * @param string $clientFilename name of the uploaded file
+     * @param string $modId          ID of the mod (Slug)
+     * @param string $modVersion     Version of the mod
+     * @return void
+     */
+    private function createNewZippedModFile($tempFilename, $modId, $modVersion)
     {
         //create mod zip file! move to app/public/mods/modslug/modslug-version.zip
-        $newFileName = $modInfo->modid.'-'.$modInfo->version.'.zip';
+        $newFileName = $modId.'-'.$modVersion.'.zip';
         $newFileTempPath = 'modstmp/'.$newFileName;
-        $newFileFullTempPath = '/var/www/storage/app/'.$newFileTempPath;
-        $newFilePubPath = 'public/mods/'.$modInfo->modid.'/'.$newFileName;
-        $newFileFullPubPath = '/var/www/storage/app/'.$newFilePubPath;
+        $newFileFullTempPath = storage_path().'/app/'.$newFileTempPath;
+        $newFilePubPath = 'public/mods/'.$modId.'/'.$newFileName;
+        $newFileFullPubPath = storage_path().'/app/'.$newFilePubPath;
         Log::debug('Creating new zip file as modstmp/' . $newFileName);
         $newZipFile = new ZipArchive;
         //check if the file already exists. if yes, delete it.
@@ -522,7 +590,7 @@ class ModController extends Controller
         }
         if ($newZipFile->addEmptyDir('mods')) {
             //add the file now.
-            if ($newZipFile->addFile($ulFileFullTmpPath, 'mods/'.$clientFilename)) {
+            if ($newZipFile->addFile(storage_path().'/app/modstmp/'.$tempFilename, 'mods/'.$tempFilename)) {
                 //Add successfull, close archive.
                 $newZipFile->close();
                 //now move new file.

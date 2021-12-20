@@ -71,10 +71,18 @@
 						<input type="text" class="form-control" name="name-new" id="name-new">
 					</div>
 					<div class="form-group">
+						<label for="name">Mod Version</label>
+						<input type="text" class="form-control" name="mod-version" id="mod-version">
+					</div>
+					<div class="form-group">
+						<label for="name">for MC Version</label>
+						<input type="text" class="form-control" name="mc-version" id="mc-version">
+					</div>
+					<div class="form-group">
 						<label for="name">Add to Existing mod:</label>
-						<select class="form-control" name="name" id="name">
-							@foreach ($mods as $mod)
+						<select class="form-control" name="modselect" id="modselect" onchange="modselectChange()">
 								<option value="0" selected>No, create new Mod</option>
+							@foreach ($mods as $mod)
 								<option value="{{$mod->name}}">{{$mod->pretty_name}}</option>
 							@endforeach
 						</select>
@@ -119,6 +127,8 @@
 		//load mods infos into form:
 		$('#pretty_name').val(modInfo.name);
 		$('#name-new').val(modInfo.modid);
+		$('#mod-version').val(modInfo.version);
+		$('#mc-version').val(modInfo.mcversion);
 		$('#author').val(modInfo.authorList.join());
 		$('#description').val(modInfo.description);
 		$('#link').val(modInfo.url);
@@ -137,12 +147,36 @@
 		modid = $('#name-new').val(); //update key
 		newModInfo['modid'] = $('#name-new').val();
 		newModInfo['name'] = $('#pretty_name').val();
+		newModInfo['version'] = $('#mod-version').val();
+		newModInfo['mcversion'] = $('#mc-version').val();
 		newModInfo['url'] = $('#link').val();
 		newModInfo['description'] = $('#description').val();
 		newModInfo['authorList'] = $('#author').val().split(',');
 		modInfos[modid] = newModInfo; //save new values.
 		redrawTable();
+		$('#modInfoModal').modal('hide');
 	}
+
+	$('#modselect').change(function() {
+		//User changed the dropdown.
+		console.log("dropdown change")
+		if ($('#modselect').val() == 0) {
+			console.log("enabling inputs")
+			$('#pretty_name').prop("disabled", false);
+			$('#name-new').prop("disabled", false);
+			$('#author').prop("disabled", false);
+			$('#description').prop("disabled", false);
+			$('#link').prop("disabled", false);
+		} else {
+			//lock other inputs, user wants to add new version.
+			console.log("disabling inputs")
+			$('#pretty_name').prop("disabled", true);
+			$('#name-new').prop("disabled", true);
+			$('#author').prop("disabled", true);
+			$('#description').prop("disabled", true);
+			$('#link').prop("disabled", true);
+		}
+	});
 
 	function redrawTable() {
 		//clear table children
@@ -158,17 +192,96 @@
 
 	function confirmModUpload(modid = 0) {
 		if(modid == 0) {
-			//get value from button:
-			modid = $('#confirmUploadButton').val();
-		}
-		//new mod or new version?
-		if($('#name').val() == 0) {
-			//new mod. use slug from #name-new
-			new_modid = $('#name-new').val();
+			//new mod, use modid from input
+			modid = $('#name-new').val();
 		} else {
-			//new version for mod with id "modid"
+			//new version, use modid from #modselect
+			modid = $('#modselect').val();
 		}
-		//send request to server to do 
+		//Confirm the upload, so that the version gets moved to the correct folder.
+		$.ajax({
+			type: "POST",
+			url: "{{ URL::to('mod/upload/confirm') }}",
+			data: "filename="+modInfos[modid]['filename']+"&modid="+modid+"&modversion="+modInfos[modid]['version'],
+			success: function (data) {
+				if (data.status == "success") {
+					console.log(data);
+					$.jGrowl('Confirmed Upload.', { group: 'alert-success' });
+				} else if (data.status == "warning") {
+					$.jGrowl('Warning: ' + data.reason, { group: 'alert-warning' });
+				} else {
+					$.jGrowl('Error: ' + data.reason, { group: 'alert-danger' });
+				}
+			},
+			error: function (xhr, textStatus, errorThrown) {
+				$.jGrowl(textStatus + ': ' + errorThrown, { group: 'alert-danger' });
+			}
+		});
+		//new mod or new version?
+		if($('#modselect').val() == 0) {
+			createMod();
+		} else {
+			addVersion();
+		}
+		
+	}
+
+	function createMod() {
+		//new mod. use slug from #name-new
+		modSlug = $('#name-new').val();
+		//Map needed values
+		createInfo = [];
+		createInfo = modInfos[modSlug];
+		$.ajax({
+			type: "POST",
+			url: "{{ URL::to('mod/create') }}",
+			data: "name="+createInfo['modid']+"&pretty_name="+createInfo['name']+"&author="+createInfo['authorList']+"&description="+createInfo['description']+"&link="+createInfo['url'],
+			success: function (data) {
+				console.log(data);
+				if (data.status == "success") {
+					$.jGrowl('Created mod.', { group: 'alert-success' });
+					modId = data.data.id;
+					addVersion(modSlug,modId);
+				} else if (data.status == "warning") {
+					$.jGrowl('Warning: ' + data.reason, { group: 'alert-warning' });
+				} else {
+					$.jGrowl('Error: ' + data.reason, { group: 'alert-danger' });
+				}
+			},
+			error: function (xhr, textStatus, errorThrown) {
+				$.jGrowl(textStatus + ': ' + errorThrown, { group: 'alert-danger' });
+			}
+		});
+	}
+
+	function addVersion(modSlug = 0, modId = 0) {
+		//new version for mod with id "modid"
+		if (modSlug == 0) {
+			modSlug = $('#name-new').val();
+		}
+		//Map needed values
+		modVersion = modInfos[modSlug]['version'];
+		$.ajax({
+			type: "POST",
+			url: "{{ URL::to('mod/add-version') }}",
+			data: "mod-id="+modId+"&add-version="+modVersion,
+			success: function (data) {
+				console.log(data);
+				if (data.status == "success") {
+					$.jGrowl('Added version '+modVersion+" to "+modSlug, { group: 'alert-success' });
+					delete modInfos[modSlug];
+					$('#modInfoModal').modal('hide');
+					redrawTable();
+				} else if (data.status == "warning") {
+					$.jGrowl('Warning: ' + data.reason, { group: 'alert-warning' });
+				} else {
+					$.jGrowl('Error: ' + data.reason, { group: 'alert-danger' });
+				}
+			},
+			error: function (xhr, textStatus, errorThrown) {
+				$.jGrowl(textStatus + ': ' + errorThrown, { group: 'alert-danger' });
+			}
+		});
 	}
 
 	function cancelModUpload(modid = 0) {
@@ -182,11 +295,11 @@
 	}
 </script>
 <script type="text/javascript">
-$("#name").slugify('#pretty_name');
+/*$("#name").slugify('#pretty_name');
 $(".modslug").slugify("#pretty_name");
 $("#name").keyup(function() {
 	$(".modslug").html($(this).val());
-});
+});*/
 
 $(document).ready(function() {
 
@@ -250,9 +363,17 @@ $(document).ready(function() {
                     var modInfo = data.modInfo;
 					var filename = data.uploadedFile;
 					if(modInfo == false || modInfo.length == 0) {
+						//Set default values
 						modInfo = [];
-						modInfo["name"] = filename; modInfo["modid"] = filename; modInfo["authorList"] = ['none', 'defined']; modInfo["description"] = ''; modInfo["url"] = '';
+						modInfo["name"] = filename;
+						modInfo["modid"] = filename;
+						modInfo["authorList"] = ['none', 'defined'];
+						modInfo["description"] = '';
+						modInfo["url"] = '';
+						modInfo["version"] = 0;
+						modInfo["mcversion"] = 0;
 					}
+					modInfo["filename"] = filename;
 					addModInfo(modInfo);
 					redrawTable();
 				} else {

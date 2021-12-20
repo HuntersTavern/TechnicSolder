@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('mod/create', 'ModController@getCreate')->name('mod.create');
     Route::post('mod/create', 'ModController@postCreate');
     Route::post('mod/upload', 'ModController@postUpload');
+    Route::post('mod/upload/confirm', 'ModController@postUploadConfirm');
     Route::get('mod/delete/{mod_id}', 'ModController@getDelete')->name('mod.delete');
     Route::post('mod/delete/{mod_id}', 'ModController@postDelete');
     Route::post('mod/modify/{mod_id}', 'ModController@postModify');
