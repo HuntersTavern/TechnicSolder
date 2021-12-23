@@ -31,6 +31,7 @@ function viewMod(modid) {
         disableInputs();
     } else {
         $('#modselect').val(0);
+        enableInputs();
     }
     
     //Show modal:
