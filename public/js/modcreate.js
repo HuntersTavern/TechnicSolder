@@ -29,6 +29,8 @@ function viewMod(modid) {
         //Set select to modid:
         $('#modselect').val(modid);
         disableInputs();
+    } else {
+        $('#modselect').val(0);
     }
     
     //Show modal:
@@ -120,7 +122,6 @@ function confirmModUpload(modSlug = null, modId = null, newMod = true) {
                     modId = data.data[0].id;
                     addVersion(modSlug,modId);
                 }
-                $('#modselect').val(0);
             } else if (data.status == "warning") {
                 $.jGrowl('Warning: ' + data.reason, { group: 'alert-warning' });
                 data.errors.array.forEach(error => {
