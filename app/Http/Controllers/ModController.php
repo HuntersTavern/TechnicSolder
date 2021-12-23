@@ -86,7 +86,13 @@ class ModController extends Controller
             $filename = Request::input('filename');
             $modid = Request::input('modid');
             $modversion = Request::input('modversion');
-            $this->createNewZippedModFile($filename, $modid, $modversion); //TODO: Move file to new folder.
+            $this->createNewZippedModFile($filename, $modid, $modversion);
+            //delete tmpfile:
+            $deletePath = storage_path().'/app/modstmp/'.$filename;
+            unlink($deletePath);
+            //Check if mod already exists, if so return its data:
+            $mod = Mod::where('name', $modid)->first();
+            return response()->json(['status' => 'success', 'data' => [$mod]]);
         }
     }
 
