@@ -178,10 +178,11 @@ function addVersion(modSlug = 0, modId = 0) {
     }
     //Map needed values
     modVersion = modInfos[modSlug]['version'];
+    mcVersion = modInfos[modSlug]['mcversion'];
     $.ajax({
         type: "POST",
         url: "/mod/add-version",
-        data: "mod-id="+modId+"&add-version="+modVersion,
+        data: "mod-id="+modId+"&add-version="+modVersion+"&mcversion="+mcVersion,
         success: function (data) {
             console.log(data);
             if (data.status == "success") {

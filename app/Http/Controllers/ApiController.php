@@ -131,6 +131,8 @@ class ApiController extends Controller
 
                 $response['versions'] = $mod->versions->pluck('version');
 
+                $response['versions_with_mcversion'] = $mod->versions->pluck('mcversion', 'version'); //Mc-Version => Mod-Version
+
                 return response()->json($response);
             }
 

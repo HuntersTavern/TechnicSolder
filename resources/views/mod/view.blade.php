@@ -71,7 +71,8 @@
 				<table class="table">
 					<thead>
 						<th style="width: 1%"></th>
-						<th style="width: 15%">Version</th>
+						<th style="width: 5%">Version</th>
+						<th style="width: 10%">MC-Version</th>
 						<th style="width: 25%">MD5</th>
 						<th style="width: 35%">Download URL</th>
 						<th style="width: 9%">Filesize</th>
@@ -82,10 +83,9 @@
 							<form method="post" id="add" action="{{ URL::to('mod/add-version') }}">
 								<input type="hidden" name="mod-id" value="{{ $mod->id }}">
 								<td></td>
-								<td>
-									<input type="text" name="add-version" id="add-version" class="form-control"></td>
-								<td>
-									<input type="text" name="add-md5" id="add-md5" class="form-control"></td>
+								<td><input type="text" name="add-version" id="add-version" class="form-control"></td>
+								<td><input type="text" name="mcversion" id="mcversion" class="form-control"></td>
+								<td><input type="text" name="add-md5" id="add-md5" class="form-control"></td>
 								</td>
 								<td><span id="add-url">N/A</span></td>
 								<td>N/A</td>
@@ -98,6 +98,7 @@
 								<input type="hidden" name="version-id" value="{{ $ver->id }}">
 								<td><i class="version-icon fa fa-plus" rel="{{ $ver->id }}"></i></td>
 								<td class="version" rel="{{ $ver->id }}">{{ $ver->version }}</td>
+								<td class="mcversion" rel="{{ $ver->id }}">{{ $ver->mcversion }}</td>
 								<td><input type="text" class="md5 form-control" name="md5" rel="{{ $ver->id }}" placeholder="{{ $ver->md5 }}"></td>
 								<td class="url" rel="{{ $ver->id }}"><small><a href="{{ config('solder.mirror_url').'mods/'.$mod->name.'/'.$mod->name.'-'.$ver->version.'.zip' }}">{{ config('solder.mirror_url').'mods/'.$mod->name.'/'.$mod->name.'-'.$ver->version.'.zip' }}</a></small></td>
 								<td class="filesize" rel="{{ $ver->id }}">{{ $ver->humanFilesize() }}</td>

@@ -93,7 +93,7 @@
 							<div class="form-group input-group">
 								<select class="form-control" name="version">
 									@foreach ($ver->mod->versions as $version)
-									<option value="{{ $version->id }}"{{ $selected = ($ver->version == $version->version ? 'selected' : '') }}>{{ $version->version }}</option>
+									<option value="{{ $version->id }}"{{ $selected = ($ver->version == $version->version ? 'selected' : '') }}>{{ $version->version }} for MC-{{$version->mcversion}}</option>
 									@endforeach
 								</select>
 								<span class="input-group-btn">
@@ -150,7 +150,7 @@ var $select = $("#mod").selectize({
 								callback();
 							} else {
 								callback(data.versions.map(function (x) {
-									return {value: x, text: x}
+									return {value: x, text: x+' for MC-'+data.versions_with_mcversion[x]} //TODO: Maybe add color for mismatching MC Versions?
 								}));
 								modversion.enable();
 								modversion.refreshOptions(true);

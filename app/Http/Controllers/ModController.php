@@ -331,6 +331,7 @@ class ModController extends Controller
         $mod_id = Request::input('mod-id');
         $md5 = Request::input('add-md5');
         $version = Request::input('add-version');
+        $mcversion = Request::input('mcversion');
         if (empty($mod_id) || empty($version)) {
             return response()->json([
                 'status' => 'error',
@@ -369,7 +370,7 @@ class ModController extends Controller
         $ver = new Modversion();
         $ver->mod_id = $mod->id;
         $ver->version = $version;
-
+        $ver->mcversion = $mcversion;
         if ($file_md5['success'] && !empty($md5)) {
             if ($md5 === $file_md5['md5']) {
                 $ver->filesize = $file_md5['filesize'];
