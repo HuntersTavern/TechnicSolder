@@ -3,8 +3,7 @@
     <title>{{ $build->version }} - {{ $build->modpack->name }} - Technic Solder</title>
 @stop
 @section('top')
-    <script src="{{ asset('js/selectize.min.js') }}"></script>
-    <link href="{{ asset('css/selectize.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/Selectize/selectize.css') }}" rel="stylesheet">
 @endsection
 @section('content')
 <div class="page-header">
@@ -120,6 +119,7 @@
 </div>
 @endsection
 @section('bottom')
+<script src="{{ asset('assets/Selectize/selectize.min.js') }}"></script>
 <script type="text/javascript">
 var $select = $("#mod").selectize({
 			dropdownParent: "body",

@@ -6,6 +6,7 @@
 
 @section('top')
 <link href="{{asset('css/upload.css')}}" rel="stylesheet"/>
+<link href="{{ asset('assets/Selectize/selectize.css') }}" rel="stylesheet">
 @stop
 
 @section('content')
@@ -112,7 +113,7 @@
 @endsection
 
 @section('bottom')
-<script src="{{ asset('assets/select2/js/select2.full.min.js') }}"></script>
+<script src="{{ asset('assets/Selectize/selectize.min.js') }}"></script>
 <script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script src="{{ asset('js/modcreate.js') }}"></script>
 <script>
