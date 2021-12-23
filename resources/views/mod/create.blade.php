@@ -117,8 +117,8 @@
 <script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script src="{{ asset('js/modcreate.js') }}"></script>
 <script>
-	/*$(document).ready(function() {
-		$('#modselect').select2();
-	})*/
+	$(document).ready(function() {
+		$('#modselect').selectize();
+	})
 </script>
 @endsection
