@@ -9,6 +9,7 @@ function viewMod(modid) {
     //Load mod info:
     modInfo = modInfos[modid];
     //load mods infos into form:
+    $('#uploaded_filename').text(modInfo.filename)
     $('#pretty_name').val(modInfo.name);
     $('#name-new').val(modInfo.modid);
     $('#mod-version').val(modInfo.version);

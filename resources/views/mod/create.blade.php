@@ -59,9 +59,10 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 id="modInfoModal_Header">ModName</h4>
+				<h4 id="modInfoModal_Header">Mod-Details</h4>
 			</div>
 			<div class="modal-body">
+				Uploaded file as: <code id="uploaded_filename"></code><br/><br/>
 				<form>
 					<div class="form-group">
 						<label for="pretty_name">Mod Name</label>
