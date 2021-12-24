@@ -9,6 +9,7 @@ function viewMod(modid) {
     //Load mod info:
     modInfo = modInfos[modid];
     //load mods infos into form:
+    $('#modInfoArrayIdentifier').val(modInfo.modid);
     $('#uploaded_filename').text(modInfo.filename)
     $('#pretty_name').val(modInfo.name);
     $('#name-new').val(modInfo.modid);
@@ -17,7 +18,6 @@ function viewMod(modid) {
     $('#author').val(modInfo.authorList.join());
     $('#description').val(modInfo.description);
     $('#link').val(modInfo.url);
-    $('#setValuesButton').val(modInfo.modid);
     $('#confirmUploadButton').val(modInfo.modid);
     $('#cancelUploadButton').val(modInfo.modid);
     //Get Select options:
@@ -41,7 +41,7 @@ function viewMod(modid) {
 
 function updateMod() {
     //update the specified mod with values from modal
-    modid = $('#setValuesButton').val();
+    modid = $('#modInfoArrayIdentifier').val();
     newModInfo = modInfos[modid]; //load old values.
     delete modInfos[modid]; //remove infos from array, will be set again at the end.
     modid = $('#name-new').val(); //update key
@@ -54,7 +54,6 @@ function updateMod() {
     newModInfo['authorList'] = $('#author').val().split(',');
     modInfos[modid] = newModInfo; //save new values.
     redrawTable();
-    $('#modInfoModal').modal('hide');
 }
 
 $('#modselect').change(function() {
@@ -218,6 +217,10 @@ $(".modslug").slugify("#pretty_name");
 $("#name").keyup(function() {
 	$(".modslug").html($(this).val());
 });*/
+
+$('.changeSaveTrigger').keyup(function() {
+    updateMod();
+});
 
 $(document).ready(function() {
 

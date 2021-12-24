@@ -205,34 +205,34 @@ class ModController extends Controller
         Log::debug('Client is uploading a file.');
         $file = Request::file('file');
         $clientFilename = $file->getClientOriginalName();
-        $ulFileTmpPath = 'modstmp/'.$clientFilename;
-        $ulFileFullTmpPath = storage_path().'/app/'.$ulFileTmpPath;
+        $workingFilename = str_replace(['+'], ['-'], $clientFilename); //replace problematic chars in filename
+        $ulFileTmpPath = 'modstmp/'.$workingFilename;
         $resArr = [
             //default values:
             'success' => false,
             'newMod' => false,
             'newVersion' => false,
             'modInfo' => false,
-            'uploadedFile' => $clientFilename,
+            'uploadedFile' => $workingFilename,
             'error' => [
                 'message' => ''
             ],
             'format' => 'jar'
         ];
-        Log::debug('Client uploaded file ' . $clientFilename);
-        Storage::disk('local')->putFileAs('modstmp/', $file, $clientFilename);
+        Log::debug('Client uploaded file ' . $workingFilename);
+        Storage::disk('local')->putFileAs('modstmp/', $file, $workingFilename);
         Log::debug('Saved file as '.$ulFileTmpPath);
         $resArr['success'] = true; //mod was uploaded successfully
 
-        if (!$modInfo = $this->readModInfo($clientFilename)) {
-            Log::error('Could not read mod-info from ' . $clientFilename . '.');
+        if (!$modInfo = $this->readModInfo($workingFilename)) {
+            Log::error('Could not read mod-info from ' . $workingFilename . '.');
             $resArr['error']['message'] = 'Could not load mod Info.';
             return response()->json($resArr);
         }
 
         //validate info:
         if (!$modInfo = $this->validateModInfo($modInfo)) {
-            Log::warning($clientFilename . ' did not contain a mcmod.info file to read details out of.');
+            Log::warning($workingFilename . ' did not contain a mcmod.info file to read details out of.');
             $resArr['error']['message'] = 'Validation of mcmod.info failed.';
             return response()->json($resArr);
         } else {
