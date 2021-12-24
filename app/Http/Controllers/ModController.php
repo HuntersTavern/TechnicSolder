@@ -623,8 +623,8 @@ class ModController extends Controller
                 $dependencyId = $dependency['modId'];
                 if ($dependencyId == "minecraft") {
                     $mcDependency = $dependencies[$index];
-                    $mcDependency = str_replace(['[',']','(',')'], [''], $mcDependency);
-                    $mcDependency = trim($mcDependency, ',');
+                    $mcDependency['versionRange'] = str_replace(['[',']','(',')'], [''], $mcDependency['versionRange']);
+                    $mcDependency['versionRange'] = trim($mcDependency['versionRange'], ',');
                 }
             }
         }
