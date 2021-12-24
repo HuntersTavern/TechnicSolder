@@ -491,9 +491,9 @@ class ModController extends Controller
             if ($manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE|ZipArchive::FL_NODIR)) {
                 Log::debug("Found JSON Format mcmod.info.");
                 //get content (Will be in json):
-                $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
+                $mcModInfoContent = $zip->getFromIndex($manifestIndex);
                 Log::debug("Raw Content: ".$mcModInfoContent);
-                $mcmodInfo = json_decode($mcmodInfoContent);
+                $mcmodInfo = json_decode($mcModInfoContent);
                 $mcmodInfo['INFOTYPE'] = 'mcmod.info';
             } elseif ($manifestIndex = $zip->locateName('mods.toml', ZipArchive::FL_NOCASE|ZipArchive::FL_NODIR)) {
                 Log::debug("Found TOML Format mods.toml");
