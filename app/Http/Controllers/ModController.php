@@ -554,6 +554,7 @@ class ModController extends Controller
                 $info = $this->parseModsTomlContents($modInfo);
             }
         }
+        $info['modid'] = Str::slug($info['modid']);
         Log::debug('Validated mod-Info: ', $info);
         return (object)$info;
     }
