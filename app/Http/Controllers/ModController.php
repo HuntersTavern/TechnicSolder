@@ -494,7 +494,11 @@ class ModController extends Controller
                 $mcModInfoContent = $zip->getFromIndex($manifestIndex);
                 Log::debug("Raw Content: ".$mcModInfoContent);
                 $mcmodInfo = json_decode($mcModInfoContent);
-                $mcmodInfo['INFOTYPE'] = 'mcmod.info';
+                if (is_object($mcmodInfo)) {
+                    $mcmodInfo->{'INFOTYPE'} = 'mcmod.info';
+                } else {
+                    $mcmodInfo['INFOTYPE'] = 'mcmod.info';
+                }
             } elseif ($manifestIndex = $zip->locateName('mods.toml', ZipArchive::FL_NOCASE|ZipArchive::FL_NODIR)) {
                 Log::debug("Found TOML Format mods.toml");
                 //get content (till be a toml file format):
@@ -529,30 +533,26 @@ class ModController extends Controller
          * TOML Type: 
          */
         Log::debug("ModInfo: ".json_encode($modInfo));
-        if (isset($modInfo['INFOTYPE'])) {
-            $infoType = $modInfo['INFOTYPE'];
-            if ($infoType == 'mcmod.info') {
-                if (is_array($modInfo)) {
-                    if (is_object($modInfo[0])) {
-                        $modInfo = $modInfo[0];
-                    }
+        if (is_array($modInfo) && $modInfo['INFOTYPE'] == "mods.toml") {
+            //TOML
+            //$modInfo = $modInfo->mods[0]; //This should always be the norm. mod we are interested in should always be index 0.
+            //Dependencies are here: $modInfo->dependencies. currently not used.
+            $info = $this->parseModsTomlContents($modInfo);
+        } elseif (is_object($modInfo) && $modInfo->INFOTYPE == "mcmod.info") {
+            if (isset($modInfo->modList)) {
+                if (is_array($modInfo->modList)) {
+                    $modInfo = $modInfo->modList[0];
                 }
-                if (is_object($modInfo)) {
-                    if (isset($modInfo->modList)) {
-                        if (is_array($modInfo->modList)) {
-                            $modInfo = $modInfo->modList[0];
-                        }
-                    }
-                    if (isset($modInfo->pack)) {
-                        $modInfo = $modInfo->pack;
-                    }
-                }
-                $info = $this->parseMcmodInfoContents($modInfo);
-            } elseif ($infoType == 'mods.toml') {
-                //$modInfo = $modInfo->mods[0]; //This should always be the norm. mod we are interested in should always be index 0.
-                //Dependencies are here: $modInfo->dependencies. currently not used.
-                $info = $this->parseModsTomlContents($modInfo);
             }
+            if (isset($modInfo->pack)) {
+                $modInfo = $modInfo->pack;
+            }
+            $info = $this->parseMcmodInfoContents($modInfo);
+        } elseif (is_array($modInfo) && $modInfo['INFOTYPE'] == "mcmod.info") {
+            if (is_object($modInfo[0])) {
+                $modInfo = $modInfo[0];
+            }
+            $info = $this->parseMcmodInfoContents($modInfo);
         }
         $info['modid'] = Str::slug($info['modid']);
         Log::debug('Validated mod-Info: ', $info);
