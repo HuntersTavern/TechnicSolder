@@ -633,6 +633,8 @@ class ModController extends Controller
         //Arrayify Authors:
         if (isset($contents['authors']) && !isset($targetMod['authors'])) {
             $targetMod['authors'] = $contents['authors'];
+        } elseif (!isset($contents['authors']) && !isset($targetMod['authors'])) {
+            $targetMod['authors'] = 'none,defined';
         }
         if (strpos($targetMod['authors'], ',')) {
             $targetMod['authors'] = explode(',', $targetMod['authors']);
