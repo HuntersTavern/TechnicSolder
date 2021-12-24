@@ -307,7 +307,7 @@ $(document).ready(function() {
 				this.cancelButton.remove();
 				var error = error.message;
 				var errorDiv = $('<div class="error"></div>').text(error);
-				this.block.append(errorDiv);
+				this.row.append(errorDiv);
 			},
 
 			cancel: function(){

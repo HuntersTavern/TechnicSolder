@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use ZipArchive;
+use Yosymfony\Toml\Toml;
 
 class ModController extends Controller
 {
@@ -487,10 +488,20 @@ class ModController extends Controller
         $mcmodInfo = [false];
         $res = $zip->open(storage_path().'/app/modstmp/'.$filename, ZipArchive::RDONLY);
         if ($res === true) {
-            if ($manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE)) {
+            if ($manifestIndex = $zip->locateName('mcmod.info', ZipArchive::FL_NOCASE|ZipArchive::FL_NODIR)) {
+                Log::debug("Found JSON Format mcmod.info.");
                 //get content (Will be in json):
                 $mcmodInfoContent = $zip->getFromIndex($manifestIndex);
+                Log::debug("Raw Content: ".$mcModInfoContent);
                 $mcmodInfo = json_decode($mcmodInfoContent);
+                $mcmodInfo['INFOTYPE'] = 'mcmod.info';
+            } elseif ($manifestIndex = $zip->locateName('mods.toml', ZipArchive::FL_NOCASE|ZipArchive::FL_NODIR)) {
+                Log::debug("Found TOML Format mods.toml");
+                //get content (till be a toml file format):
+                $mcModInfoContent = $zip->getFromIndex($manifestIndex);
+                Log::debug("Raw Content: ".$mcModInfoContent);
+                $mcmodInfo = Toml::Parse($mcModInfoContent);
+                $mcmodInfo['INFOTYPE'] = 'mods.toml';
             }
             $zip->close();
         } else {
@@ -515,54 +526,135 @@ class ModController extends Controller
          * [{modList->[{infos}]}]
          * {infos}
          * {pack->{infos}}
+         * TOML Type: 
          */
         Log::debug("ModInfo: ".json_encode($modInfo));
-        if (is_array($modInfo)) {
-            if (is_object($modInfo[0])) {
-                $modInfo = $modInfo[0];
-            }
-        }
-        if (is_object($modInfo)) {
-            if (isset($modInfo->modList)) {
-                if (is_array($modInfo->modList)) {
-                    $modInfo = $modInfo->modList[0];
+        if (isset($modInfo['INFOTYPE'])) {
+            $infoType = $modInfo['INFOTYPE'];
+            if ($infoType == 'mcmod.info') {
+                if (is_array($modInfo)) {
+                    if (is_object($modInfo[0])) {
+                        $modInfo = $modInfo[0];
+                    }
                 }
-            }
-            if (isset($modInfo->pack)) {
-                $modInfo = $modInfo->pack;
+                if (is_object($modInfo)) {
+                    if (isset($modInfo->modList)) {
+                        if (is_array($modInfo->modList)) {
+                            $modInfo = $modInfo->modList[0];
+                        }
+                    }
+                    if (isset($modInfo->pack)) {
+                        $modInfo = $modInfo->pack;
+                    }
+                }
+                $info = $this->parseMcmodInfoContents($modInfo);
+            } elseif ($infoType == 'mods.toml') {
+                //$modInfo = $modInfo->mods[0]; //This should always be the norm. mod we are interested in should always be index 0.
+                //Dependencies are here: $modInfo->dependencies. currently not used.
+                $info = $this->parseModsTomlContents($modInfo);
             }
         }
+        Log::debug('Validated mod-Info: ', $info);
+        return (object)$info;
+    }
+
+    /**
+     * Parses the contents of the mcmod.info format.
+     *
+     * @param object $contents contents of the file. retrieved as object.
+     * @return array|bool returns an array or a boolean if operation fails.
+     */
+    private function parseMcmodInfoContents($contents)
+    {
+        $info = [];
         //check if important infos are set and if not, set default value:
-        if (!isset($modInfo->modid)) {
+        if (!isset($contents->modid)) {
             return false; //without modid, the info is not really usable.
         } else {
             //generate mod slug:
-            $info['modid'] = Str::slug($modInfo->modid);
+            $info['modid'] = Str::slug($contents->modid);
         }
-        $info['name'] = $modInfo->name ?? 'no pretty name given.'; //pretty name. required
-        $info['description'] = $modInfo->description ?? 'no description given'; //description of the mod.
-        $info['version'] = $modInfo->version ?? 'no mod version given.'; //version of the mod
-        $info['mcversion'] = $modInfo->mcversion ?? 'no minecraft version given.'; //version of mc this version of the mod works on. ~ can be 1.12.x || 1.12.2  || 1.12.1-1.13.1 or any variation
-        $info['url'] = $modInfo->url ?? ''; //shows url of author? OPTIONAL!
-        $info['updateUrl'] = $modInfo->updateUrl ?? ''; //link to a url with versions listed.
-        $info['updateJson'] = $modInfo->updateJson ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
-        $info['authorList'] = $modInfo->authorList ?? ['no author list provided.']; //Array of persons that authored this mod.
-        if (!isset($modInfo->authorList) && isset($modInfo->authors)) {
-            $info['authorList'] = $modInfo->authors; //many authors use this instead of the official way.
+        $info['name'] = $contents->name ?? 'no pretty name given.'; //pretty name. required
+        $info['description'] = $contents->description ?? 'no description given'; //description of the mod.
+        $info['version'] = $contents->version ?? 'no mod version given.'; //version of the mod
+        $info['mcversion'] = $contents->mcversion ?? 'no minecraft version given.'; //version of mc this version of the mod works on. ~ can be 1.12.x || 1.12.2  || 1.12.1-1.13.1 or any variation
+        $info['url'] = $contents->url ?? ''; //shows url of author? OPTIONAL!
+        $info['updateUrl'] = $contents->updateUrl ?? ''; //link to a url with versions listed.
+        $info['updateJson'] = $contents->updateJson ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
+        $info['authorList'] = $contents->authorList ?? ['no author list provided.']; //Array of persons that authored this mod.
+        if (!isset($contents->authorList) && isset($contents->authors)) {
+            $info['authorList'] = $contents->authors; //many authors use this instead of the official way.
         }
-        $info['credits'] = $modInfo->credits ?? 'no credits given.'; //credits? idk OPTIONAL!
-        $info['logoFile'] = $modInfo->logoFile ?? 'no logo file path provided.'; //If the author included an logo, it will be referenced here.
-        $info['screenshots'] = $modInfo->screenshots ?? ['no screenshot urls provided']; //Screenshots of the mod. OPTIONAL!
-        $info['parent'] = $modInfo->parent ?? 'no parent id provided'; //id of the parent mod. for example used in modular mods as Buildcraft or mekanism.
-        $info['useDependencyInformation'] = $modInfo->useDependencyInformation ?? false; //if true, the next three dependency args should be used.
-        $info['requiredMods'] = $modInfo->requiredMods ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash.
-        $info['dependencies'] = $modInfo->dependencies ?? ['no dependencies provided']; //A list of modids. All of the listed mods will load before this one. If one is not present, nothing happens.
-        if (!isset($modInfo->dependencies) && isset($modInfo->dependancies)) {
-            $info['dependencies'] = $modInfo->dependancies; //spelling mistake. observed in ichuns backtools v4.0.0 (default mod included in solder.)
+        $info['credits'] = $contents->credits ?? 'no credits given.'; //credits? idk OPTIONAL!
+        $info['logoFile'] = $contents->logoFile ?? 'no logo file path provided.'; //If the author included an logo, it will be referenced here.
+        $info['screenshots'] = $contents->screenshots ?? ['no screenshot urls provided']; //Screenshots of the mod. OPTIONAL!
+        $info['parent'] = $contents->parent ?? 'no parent id provided'; //id of the parent mod. for example used in modular mods as Buildcraft or mekanism.
+        $info['useDependencyInformation'] = $contents->useDependencyInformation ?? false; //if true, the next three dependency args should be used.
+        $info['requiredMods'] = $contents->requiredMods ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash.
+        $info['dependencies'] = $contents->dependencies ?? ['no dependencies provided']; //A list of modids. All of the listed mods will load before this one. If one is not present, nothing happens.
+        if (!isset($contents->dependencies) && isset($contents->dependancies)) {
+            $info['dependencies'] = $contents->dependancies; //spelling mistake. observed in ichuns backtools v4.0.0 (default mod included in solder.)
         }
-        $info['dpendants'] = $modInfo->dpendants ?? ['no dependants provided.']; //A list of modids. All of the listed mods will load after this one. If one is not present, nothing happens.
+        $info['dpendants'] = $contents->dpendants ?? ['no dependants provided.']; //A list of modids. All of the listed mods will load after this one. If one is not present, nothing happens.
         //send filled info back
-        return (object)$info;
+        return $info;
+    }
+
+    /**
+     * Parses the contents of the mods.toml format.
+     *
+     * @param object $contents contents of the file. retrieved as object.
+     * @return array|bool returns an array or a boolean if operation fails.
+     */
+    private function parseModsTomlContents($contents)
+    {
+        $info = [];
+        $mcDependency = [];
+        $mods = $contents['mods'];
+        $targetMod = $mods[0];
+        $modId = $targetMod['modId'];
+        if (!isset($contents['dependencies']) || !isset($contents['dependencies'][$modId])) {
+            $dependencies = [];
+        } else {
+            $dependencies = $contents['dependencies'][$modId];
+            //check dependencies for minecraft definition:
+            foreach ($dependencies as $index => $dependency) {
+                $dependencyId = $dependency['modId'];
+                if ($dependencyId == "minecraft") {
+                    $mcDependency = $dependencies[$index];
+                }
+            }
+        }
+        
+
+        //Arrayify Authors:
+        if (isset($contents['authors']) && !isset($targetMod['authors'])) {
+            $targetMod['authors'] = $contents['authors'];
+        }
+        if (strpos($targetMod['authors'], ',')) {
+            $targetMod['authors'] = explode(',', $targetMod['authors']);
+        } else {
+            $targetMod['authors'] = [$targetMod['authors']];
+        }
+
+        $info['modid'] = $modId;
+        $info['name'] = $targetMod['displayName'] ?? 'no pretty name given.'; //pretty name. required
+        $info['description'] = $targetMod['description'] ?? 'no description given'; //description of the mod.
+        $info['version'] = $targetMod['version'] ?? 'no mod version given.'; //version of the mod
+        $info['mcversion'] =  $mcDependency['versionRange'] ?? 'no minecraft version given.'; //version of mc this version of the mod works on. ~ can be 1.12.x || 1.12.2  || 1.12.1-1.13.1 or any variation
+        $info['url'] = $targetMod['displayURL'] ?? ''; //shows url of author? OPTIONAL!
+        $info['updateUrl'] = $targetMod['updateJSONURL'] ?? ''; //link to a url with versions listed.
+        $info['updateJson'] = $targetMod['updateJSONURL'] ?? 'no updatejson url given.'; //link to a json "file" with versions listed.
+        $info['authorList'] = $targetMod['authors'] ?? ['no author list provided.']; //Array of persons that authored this mod.
+        $info['credits'] = $targetMod['credits'] ?? 'no credits given.'; //credits? idk OPTIONAL!
+        $info['logoFile'] = $targetMod['logoFile'] ?? 'no logo file path provided.'; //If the author included an logo, it will be referenced here.
+        $info['screenshots'] = $targetMod['screenshots'] ?? ['no screenshot urls provided']; //Screenshots of the mod. OPTIONAL!
+        $info['parent'] = $targetMod['parent'] ?? 'no parent id provided'; //id of the parent mod. for example used in modular mods as Buildcraft or mekanism.
+        $info['useDependencyInformation'] = $targetMod['useDependencyInformation'] ?? false; //if true, the next three dependency args should be used.
+        $info['requiredMods'] = $targetMod['requiredMods'] ?? ['no requirements provided.']; //A list of modids. If one is missing, the game will crash.
+        $info['dependencies'] = $dependencies ?? ['no dependencies provided']; //A list of modids. All of the listed mods will load before this one. If one is not present, nothing happens.
+
+        return $info;
     }
 
     /**
