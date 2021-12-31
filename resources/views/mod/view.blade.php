@@ -1,10 +1,10 @@
 @extends('layouts/master')
 @section('title')
-		<title>{{ empty($mod->pretty_name) ? $mod->name : $mod->pretty_name }} - Technic Solder</title>
+	<title>{{ empty($mod->pretty_name) ? $mod->name : $mod->pretty_name }} - Technic Solder</title>
 @stop
 @section('content')
 <div class="page-header">
-<h1>Mod Library</h1>
+	<h1>Mod Library</h1>
 </div>
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -16,11 +16,11 @@
 	</div>
 	<div class="panel-body">
 		<ul class="nav nav-tabs" id="tabs">
-						<li class="active"><a href="#versions" data-toggle="tab">Versions</a></li>
-						<li><a href="#details" data-toggle="tab">Details</a></li>
-				</ul>
-				<div class="tab-content">
-					<div class="tab-pane fade" id="details">
+			<li class="active"><a href="#versions" data-toggle="tab">Versions</a></li>
+			<li><a href="#details" data-toggle="tab">Details</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane fade" id="details">
 				<br>
 				@if ($errors->all())
 					<div class="alert alert-danger">
@@ -38,25 +38,41 @@
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
-													<label for="pretty_name">Mod Name</label>
-													<input type="text" class="form-control" name="pretty_name" id="pretty_name" value="{{ $mod->pretty_name }}">
-											</div>
-											<div class="form-group">
-													<label for="name">Mod Slug</label>
-													<input type="text" class="form-control" name="name" id="name" value="{{ $mod->name }}">
-											</div>
-											<div class="form-group">
-													<label for="author">Author</label>
-													<input type="text" class="form-control" name="author" id="author" value="{{ $mod->author }}">
-											</div>
-											<div class="form-group">
-													<label for="description">Description</label>
-													<textarea name="description" id="description" class="form-control" rows="5">{{ $mod->description }}</textarea>
-											</div>
-											<div class="form-group">
-													<label for="link">Mod Website</label>
-													<input type="text" class="form-control" name="link" id="link" value="{{ $mod->link }}">
-											</div>
+								<label for="pretty_name">Mod Name</label>
+								<input type="text" class="form-control" name="pretty_name" id="pretty_name" value="{{ $mod->pretty_name }}">
+							</div>
+							<div class="form-group">
+								<label for="name">Mod Slug</label>
+								<input type="text" class="form-control" name="name" id="name" value="{{ $mod->name }}">
+							</div>
+							<div class="form-group">
+								<label for="type">Type</label>
+								<select name="type" id="type" class="form-control">
+									<option value="mod" {{ $selected = ($mod->type == 'mod' ? 'selected' : '') }}>Mod</option>
+									<option value="loader" {{ $selected = ($mod->type == 'loader' ? 'selected' : '') }}>Loader</option>
+									<option value="other" {{ $selected = ($mod->type == 'other' ? 'selected' : '') }}>Other</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="side">Side</label>
+								<select name="side" id="side" class="form-control">
+									<option value="both" {{ $selected = ($mod->side == 'both' ? 'selected' : '') }}>Both</option>
+									<option value="client" {{ $selected = ($mod->side == 'client' ? 'selected' : '') }}>Client only</option>
+									<option value="server" {{ $selected = ($mod->side == 'server' ? 'selected' : '') }}>Server only</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="author">Author</label>
+								<input type="text" class="form-control" name="author" id="author" value="{{ $mod->author }}">
+							</div>
+							<div class="form-group">
+								<label for="description">Description</label>
+								<textarea name="description" id="description" class="form-control" rows="5">{{ $mod->description }}</textarea>
+							</div>
+							<div class="form-group">
+								<label for="link">Mod Website</label>
+								<input type="text" class="form-control" name="link" id="link" value="{{ $mod->link }}">
+							</div>
 						</div>
 					</div>
 					{!! Form::submit('Save Changes', ['class' => 'btn btn-success']) !!}
@@ -122,7 +138,7 @@
 						@endforeach
 					</tbody>
 				</table>
-						</div>
+			</div>
 		</div>
 	</div>
 </div>

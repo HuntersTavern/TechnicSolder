@@ -45,6 +45,7 @@ class Modversion extends Model
             "name" => $this->mod->name,
             "version" => $this->version,
             "mcversion" => $this->mcversion,
+            "loader" => $this->loader,
             "md5" => $this->md5,
             "filesize" => $this->filesize,
             "url" => $this->url,
