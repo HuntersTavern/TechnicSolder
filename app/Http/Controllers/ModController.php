@@ -187,6 +187,50 @@ class ModController extends Controller
         return redirect('mod/view/' . $mod->id)->with('success', 'Mod successfully edited.');
     }
 
+    public function postModifyVersion($version_id = null)
+    {
+        $rules = [
+            'version' => 'required',
+            'mcversion' => 'required',
+            'loader' => 'required',
+        ];
+
+        $messages = [
+            'version.required' => 'You must provide a version for the mod',
+            'mcversion.required' => 'You must provide a Minecraft-Version',
+            'loader.required' => 'You must provide a Valid launcher',
+        ];
+
+        $validation = Validator::make(Request::all(), $rules, $messages);
+        if ($validation->fails()) {
+            return redirect('mod/list')->withErrors($validation->messages());
+        }
+
+        if (empty($version_id)) {
+            return response()->json([
+                'status' => 'error',
+                'reason' => 'Missing Post Data'
+            ]);
+        }
+
+        $ver = Modversion::find($version_id);
+        if (empty($ver)) {
+            return response()->json([
+                'status' => 'error',
+                'reason' => 'Could not pull mod version from database'
+            ]);
+        }
+
+        $ver->version = Request::input('version');
+        $ver->mcversion = Request::input('mcversion');
+        $ver->loader = Request::input('loader');
+        $ver->save();
+        return response()->json([
+            'status' => 'success',
+            'version' => Request::input('version'),
+        ]);
+    }
+
     public function postDelete($mod_id = null)
     {
         $mod = Mod::find($mod_id);
@@ -344,6 +388,8 @@ class ModController extends Controller
         $md5 = Request::input('add-md5');
         $version = Request::input('add-version');
         $mcversion = Request::input('mcversion');
+        $loader = Request::input('loader');
+
         if (empty($mod_id) || empty($version)) {
             return response()->json([
                 'status' => 'error',
@@ -379,10 +425,16 @@ class ModController extends Controller
             $pfile_md5 = !$file_md5['success'] ? "Null" : $file_md5['md5'];
         }
 
+        //check if loader is an expected value:
+        if (!in_array($loader, ['forge', 'fabric'])) {
+            $loader = 'forge'; //just default to forge
+        }
+
         $ver = new Modversion();
         $ver->mod_id = $mod->id;
         $ver->version = $version;
         $ver->mcversion = $mcversion;
+        $ver->loader = $loader;
         if ($file_md5['success'] && !empty($md5)) {
             if ($md5 === $file_md5['md5']) {
                 $ver->filesize = $file_md5['filesize'];

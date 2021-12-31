@@ -89,8 +89,9 @@
 						<th style="width: 1%"></th>
 						<th style="width: 5%">Version</th>
 						<th style="width: 10%">MC-Version</th>
+						<th style="widht: 5%">Loader</th>
 						<th style="width: 25%">MD5</th>
-						<th style="width: 35%">Download URL</th>
+						<th style="width: 20%">Download URL</th>
 						<th style="width: 9%">Filesize</th>
 						<th style="width: 15%"></th>
 					</thead>
@@ -101,6 +102,10 @@
 								<td></td>
 								<td><input type="text" name="add-version" id="add-version" class="form-control"></td>
 								<td><input type="text" name="mcversion" id="mcversion" class="form-control"></td>
+								<td><select name="loader" id="loader" class="form-control">
+									<option value="forge" selected>Forge (FML)</option>
+									<option value="fabric">Fabric</option>
+								</select></td>
 								<td><input type="text" name="add-md5" id="add-md5" class="form-control"></td>
 								</td>
 								<td><span id="add-url">N/A</span></td>
@@ -113,12 +118,20 @@
 							<form class="rehash-form" data-version-id="{{ $ver->id }}">
 								<input type="hidden" name="version-id" value="{{ $ver->id }}">
 								<td><i class="version-icon fa fa-plus" rel="{{ $ver->id }}"></i></td>
-								<td class="version" rel="{{ $ver->id }}">{{ $ver->version }}</td>
-								<td class="mcversion" rel="{{ $ver->id }}">{{ $ver->mcversion }}</td>
-								<td><input type="text" class="md5 form-control" name="md5" rel="{{ $ver->id }}" placeholder="{{ $ver->md5 }}"></td>
+								<td><input type="text" name="version" class="modversion form-control" rel="{{ $ver->id }}" value="{{ $ver->version }}"/></td>
+								<td><input type="text" name="mcversion" class="mcversion form-control" rel="{{ $ver->id }}" value="{{ $ver->mcversion }}"/></td>
+								<td><select name="loader" class="loader form-control" rel="{{ $ver->id }}">
+									<option value="forge" {{ $selected = ($ver->loader == 'forge' ? 'selected' : '') }}>Forge (FML)</option>
+									<option value="fabric" {{ $selected = ($ver->loader == 'fabric' ? 'selected' : '') }}>Fabric</option>
+								</select></td>
+								<!--<td><input type="text" class="md5 form-control" name="md5" rel="{{ $ver->id }}" placeholder="{{ $ver->md5 }}"></td>-->
+								<td class="md5" rel="{{ $ver->id }}">{{ $ver->md5 }}</td>
 								<td class="url" rel="{{ $ver->id }}"><small><a href="{{ config('solder.mirror_url').'mods/'.$mod->name.'/'.$mod->name.'-'.$ver->version.'.zip' }}">{{ config('solder.mirror_url').'mods/'.$mod->name.'/'.$mod->name.'-'.$ver->version.'.zip' }}</a></small></td>
 								<td class="filesize" rel="{{ $ver->id }}">{{ $ver->humanFilesize() }}</td>
-								<td><button type="submit" class="btn btn-primary btn-xs" rel="{{ $ver->id }}">Rehash</button> <button class="btn btn-danger btn-xs delete" rel="{{ $ver->id }}">Delete</button>
+								<td>
+									<button type="submit" class="btn btn-primary btn-xs" rel="{{ $ver->id }}">Rehash</button>
+									<button class="btn btn-warning btn-xs update" rel="{{$ver->id}}">Update</button>
+									<button class="btn btn-danger btn-xs delete" rel="{{ $ver->id }}">Delete</button>
 							</form>
 						</tr>
 						<tr class="version-details" rel="{{ $ver->id }}" style="display: none">
@@ -207,7 +220,7 @@ $('.rehash-form').submit(function(e) {
 			} else {
 				$.jGrowl('Error: ' + data.reason, { group: 'alert-danger' });
 			}
-			md5Field.attr('placeholder', data.md5);
+			md5Field.text(data.md5);
 			filesizeField.html(data.filesize);
 			md5Field.fadeIn();
 		},
@@ -227,6 +240,32 @@ $('.delete').click(function(e) {
 				$('.version[rel=' + data.version_id + ']').fadeOut();
 				$('.version-details[rel=' + data.version_id + ']').fadeOut();
 				$.jGrowl('Mod version ' + data.version + ' deleted.', { group: 'alert-success' });
+			} else {
+				$.jGrowl('Error: ' + data.reason, { group: 'alert-danger' });
+			}
+		},
+		error: function (xhr, textStatus, errorThrown) {
+			$.jGrowl(textStatus + ': ' + errorThrown, { group: 'alert-danger' });
+		}
+	});
+});
+
+$('.update').click(function(e) {
+	e.preventDefault();
+
+	const versionId = $(this).attr('rel');
+
+	const rehashForm = ".rehash-form[data-version-id=" + versionId + "]";
+
+	$.ajax({
+		type: "POST",
+		url: "{{ url('mod/modify-version') }}/" + $(this).attr('rel'),
+		data: $(rehashForm).serialize(),
+		success: function (data) {
+			if (data.status == "success") {
+				$('.version[rel=' + data.version_id + ']').fadeOut();
+				$('.version-details[rel=' + data.version_id + ']').fadeOut();
+				$.jGrowl('Mod version ' + data.version + ' updated.', { group: 'alert-success' });
 			} else {
 				$.jGrowl('Error: ' + data.reason, { group: 'alert-danger' });
 			}

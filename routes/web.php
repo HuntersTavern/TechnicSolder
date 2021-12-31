@@ -46,6 +46,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('mod/rehash', 'ModController@anyRehash');
 //    Route::get('mod/add-version', 'ModController@anyAddVersion')->name('mod.addVersion');
     Route::post('mod/add-version', 'ModController@anyAddVersion');
+    Route::post('mod/modify-version/{version_id}', 'ModController@postModifyVersion');
     Route::post('mod/delete-version/{version_id}', 'ModController@anyDeleteVersion');
 
     Route::redirect('modpack', 'modpack/list');

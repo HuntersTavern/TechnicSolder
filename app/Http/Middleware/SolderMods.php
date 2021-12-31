@@ -30,6 +30,7 @@ class SolderMods
             case 'add-version':
             case 'rehash':
             case 'delete-version':
+            case 'modify-version':
                 $check = 'mods_manage';
                 break;
             default:
