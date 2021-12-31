@@ -66,6 +66,14 @@
 				<form>
 					<input type="hidden" name="modInfoArrayIdentifier" id="modInfoArrayIdentifier"/>
 					<div class="form-group">
+						<label for="type">Type</label>
+						<select class="form-control changeSaveTrigger" name="type" id="type">
+							<option value="mod" selected>Mod</option>
+							<option value="loader">Mod-Loader</option>
+							<option value="other">Other</option>
+						</select>
+					</div>
+					<div class="form-group">
 						<label for="pretty_name">Mod Name</label>
 						<input type="text" class="form-control changeSaveTrigger" name="pretty_name" id="pretty_name">
 					</div>
@@ -74,8 +82,23 @@
 						<input type="text" class="form-control changeSaveTrigger" name="name-new" id="name-new">
 					</div>
 					<div class="form-group">
+						<label for="side">Side</label>
+						<select class="form-control changeSaveTrigger" name="side" id="side">
+							<option value="mod" selected>Both</option>
+							<option value="loader">Client only</option>
+							<option value="other">Server only</option>
+						</select>
+					</div>
+					<div class="form-group">
 						<label for="name">Mod Version</label>
 						<input type="text" class="form-control changeSaveTrigger" name="mod-version" id="mod-version">
+					</div>
+					<div class="form-group">
+						<label for="name">For Loader</label>
+						<select class="form-control changeSaveTrigger" name="loader" id="loader">
+							<option value="forge" selected>Forge</option>
+							<option value="fabric">Fabric</option>
+						</select>
 					</div>
 					<div class="form-group">
 						<label for="name">for MC Version</label>
@@ -83,7 +106,7 @@
 					</div>
 					<div class="form-group">
 						<label for="modselect">Add to Existing mod:</label>
-						<select class="form-control changeSaveTrigger" name="modselect" id="modselect" onchange="modselectChange()">
+						<select class="form-control changeSaveTrigger" name="modselect" id="modselect">
 								<option value="0" selected>No, create new Mod</option>
 							@foreach ($mods as $mod)
 								<option value="{{$mod->name}}">{{$mod->pretty_name}}</option>
@@ -117,9 +140,4 @@
 <script src="{{ asset('assets/Selectize/selectize.min.js') }}"></script>
 <script src="{{ asset('assets/SimpleUpload/js/simpleUpload.min.js') }}"></script>
 <script src="{{ asset('js/modcreate.js') }}"></script>
-<script>
-	$(document).ready(function() {
-		$('#modselect').selectize();
-	})
-</script>
 @endsection

@@ -122,9 +122,20 @@ class ModController extends Controller
         $mod = new Mod();
         $mod->name = Str::slug(Request::input('name'));
         $mod->pretty_name = Request::input('pretty_name');
-        $mod->author = Request::input('author');
-        $mod->description = Request::input('description');
         $mod->link = Request::input('link');
+        //The following are not required by the validator, so we check for them first.
+        if (Request::has('author')) {
+            $mod->author = Request::input('author');
+        }
+        if (Request::has('description')) {
+            $mod->description = Request::input('description');
+        }
+        if (Request::has('type')) {
+            $mod->type = Request::input('type');
+        }
+        if (Request::has('side')) {
+            $mod->side = Request::input('side');
+        }
         $mod->save();
         Log::debug("Successfully saved the new Mod as ".$mod->name);
         return response()->json(['status' => 'success', 'data' => ['id' => $mod->id]]);

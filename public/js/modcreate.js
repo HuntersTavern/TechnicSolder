@@ -1,4 +1,5 @@
 var modInfos = [];
+var modselect = $('#modselect').selectize();
 
 function addModInfo(modInfo = []) {
     //add provided info to the modinfos arr.
@@ -21,17 +22,20 @@ function viewMod(modid) {
     $('#confirmUploadButton').val(modInfo.modid);
     $('#cancelUploadButton').val(modInfo.modid);
     //Get Select options:
-    var options = $('#modselect option');
-    var modSlugs = $.map(options ,function(option) {
+    var sel = modselect[0].selectize;
+    var modSlugs = $.map(sel.options ,function(option) {
         return option.value;
     });
     console.log(modSlugs);
+    
     if (modSlugs.find(element => element == modid)) {
         //Set select to modid:
-        $('#modselect').val(modid);
+        console.log('found index for ' + modid);
+        sel.setValue(modid);
         disableInputs();
     } else {
-        $('#modselect').val(0);
+        console.log('did not find index for ' + modid);
+        sel.setValue(0);
         enableInputs();
     }
     
@@ -45,10 +49,13 @@ function updateMod() {
     newModInfo = modInfos[modid]; //load old values.
     delete modInfos[modid]; //remove infos from array, will be set again at the end.
     modid = $('#name-new').val(); //update key
+    newModInfo['type'] = $('#type').val();
     newModInfo['modid'] = $('#name-new').val();
     newModInfo['name'] = $('#pretty_name').val();
+    newModInfo['side'] = $('#side').val();
     newModInfo['version'] = $('#mod-version').val();
     newModInfo['mcversion'] = $('#mc-version').val();
+    newModInfo['loader'] = $('#loader').val();
     newModInfo['url'] = $('#link').val();
     newModInfo['description'] = $('#description').val();
     newModInfo['authorList'] = $('#author').val().split(',');
@@ -69,6 +76,8 @@ $('#modselect').change(function() {
 function enableInputs() {
     //unlock other inputs, user wants to add new mod.
     console.log("enabling inputs")
+    $('#side').prop("disabled", false);
+    $('#type').prop("disabled", false);
     $('#pretty_name').prop("disabled", false);
     $('#name-new').prop("disabled", false);
     $('#author').prop("disabled", false);
@@ -79,6 +88,8 @@ function enableInputs() {
 function disableInputs() {
     //lock other inputs, user wants to add new version.
     console.log("disabling inputs")
+    $('#side').prop("disabled", true);
+    $('#type').prop("disabled", true);
     $('#pretty_name').prop("disabled", true);
     $('#name-new').prop("disabled", true);
     $('#author').prop("disabled", true);
@@ -152,7 +163,7 @@ function createMod() {
     $.ajax({
         type: "POST",
         url: "/mod/create",
-        data: "name="+createInfo['modid']+"&pretty_name="+createInfo['name']+"&author="+createInfo['authorList']+"&description="+createInfo['description']+"&link="+createInfo['url'],
+        data: "type="+createInfo['type']+"&name="+createInfo['modid']+"&pretty_name="+createInfo['name']+"&side="+createInfo['side']+"&author="+createInfo['authorList']+"&description="+createInfo['description']+"&link="+createInfo['url'],
         success: function (data) {
             console.log(data);
             if (data.status == "success") {
@@ -179,10 +190,11 @@ function addVersion(modSlug = 0, modId = 0) {
     //Map needed values
     modVersion = modInfos[modSlug]['version'];
     mcVersion = modInfos[modSlug]['mcversion'];
+    loader = modInfos[modSlug]['loader'];
     $.ajax({
         type: "POST",
         url: "/mod/add-version",
-        data: "mod-id="+modId+"&add-version="+modVersion+"&mcversion="+mcVersion,
+        data: "mod-id="+modId+"&add-version="+modVersion+"&mcversion="+mcVersion+"&loader="+loader,
         success: function (data) {
             console.log(data);
             if (data.status == "success") {
