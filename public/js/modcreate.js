@@ -15,6 +15,7 @@ function viewMod(modid) {
     $('#pretty_name').val(modInfo.name);
     $('#name-new').val(modInfo.modid);
     $('#mod-version').val(modInfo.version);
+    $('#loader').val(modInfo.loader);
     $('#mc-version').val(modInfo.mcversion);
     $('#author').val(modInfo.authorList.join());
     $('#description').val(modInfo.description);
