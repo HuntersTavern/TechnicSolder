@@ -1,16 +1,19 @@
 var modInfos = [];
+var _runningIndex = 0;
 var modselect = $('#modselect').selectize();
 
 function addModInfo(modInfo = []) {
     //add provided info to the modinfos arr.
-    modInfos[modInfo.modid] = modInfo;
+    modInfos[_runningIndex] = modInfo;
+    _runningIndex++;
 }
 
-function viewMod(modid) {
+function viewMod(identifier) {
     //Load mod info:
-    modInfo = modInfos[modid];
+    modInfo = modInfos[identifier];
+    modid = modInfo.modid;
     //load mods infos into form:
-    $('#modInfoArrayIdentifier').val(modInfo.modid);
+    $('#modInfoArrayIdentifier').val(identifier);
     $('#uploaded_filename').text(modInfo.filename)
     $('#pretty_name').val(modInfo.name);
     $('#name-new').val(modInfo.modid);
@@ -44,14 +47,15 @@ function viewMod(modid) {
     $('#modInfoModal').modal('show');
 }
 
-function updateMod() {
-    //update the specified mod with values from modal
-    modid = $('#modInfoArrayIdentifier').val();
-    newModInfo = modInfos[modid]; //load old values.
-    delete modInfos[modid]; //remove infos from array, will be set again at the end.
+function updateMod(identifier = null) {
+    if (identifier == null) {
+        identifier = $('#modInfoArrayIdentifier').val();
+    }
+    newModInfo = modInfos[identifier]; //load old values.
+    delete modInfos[identifier]; //remove infos from array, will be set again at the end.
     modid = $('#name-new').val(); //update key
     newModInfo['type'] = $('#type').val();
-    newModInfo['modid'] = $('#name-new').val();
+    newModInfo['modid'] = modid;
     newModInfo['name'] = $('#pretty_name').val();
     newModInfo['side'] = $('#side').val();
     newModInfo['version'] = $('#mod-version').val();
@@ -60,7 +64,7 @@ function updateMod() {
     newModInfo['url'] = $('#link').val();
     newModInfo['description'] = $('#description').val();
     newModInfo['authorList'] = $('#author').val().split(',');
-    modInfos[modid] = newModInfo; //save new values.
+    modInfos[identifier] = newModInfo; //save new values.
     redrawTable();
 }
 
@@ -105,12 +109,16 @@ function redrawTable() {
     for (i=0;i<Object.keys(modInfos).length;i++) {
         key = Object.keys(modInfos)[i];
         modInfo = modInfos[key];
-        var formatFields = '<tr><td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+modInfo.modid+'\')">View</button><!--<button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+modInfo.modid+'\')">Confirm</button>--><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+modInfo.modid+'\')">Cancel</button></div></td></tr>';
+        var formatFields = '<tr><td>'+modInfo.name+'</td><td>'+modInfo.modid+'</td><td>'+modInfo.version+'</td><td>'+modInfo.mcversion+'</td><td><div class="btn-group"><button class="btn btn-sm btn-info" onclick="viewMod(\''+key+'\')">View</button><!--<button class="btn btn-sm btn-success" onclick="confirmModUpload(\''+key+'\')">Confirm</button>--><button class="btn btn-sm btn-danger" onclick="cancelModUpload(\''+key+'\')">Cancel</button></div></td></tr>';
         $('#uploads').append(formatFields);
     }
 }
 
-function confirmModUpload(modSlug = null, modId = null, newMod = true) {
+function confirmModUpload(identifier = null, modSlug = null, modId = null, newMod = true) {
+    //if no value is defined, it came from the form.
+    if (identifier == null) {
+        identifier = $('#modInfoArrayIdentifier').val();
+    }
     var selected = $('#modselect').val();
     if (selected != 0) {
         newMod = false;
@@ -119,21 +127,22 @@ function confirmModUpload(modSlug = null, modId = null, newMod = true) {
         newMod = true;
         modSlug = $('#name-new').val();
     }
+    uploadInfo = modInfos[identifier];
     //Confirm the upload, so that the version gets moved to the correct folder.
     $.ajax({
         type: "POST",
         url: "/mod/upload/confirm",
-        data: "filename="+modInfos[modSlug]['filename']+"&modid="+modSlug+"&modversion="+modInfos[modSlug]['version'],
+        data: "filename="+uploadInfo['filename']+"&modid="+modSlug+"&modversion="+uploadInfo['version'],
         success: function (data) {
             if (data.status == "success") {
                 console.log(data);
                 $.jGrowl('Confirmed Upload.', { group: 'alert-success' });
                 //new mod or new version?
                 if(newMod) {
-                    createMod();
+                    createMod(identifier);
                 } else {
                     modId = data.data[0].id;
-                    addVersion(modSlug,modId);
+                    addVersion(identifier,modSlug,modId);
                 }
             } else if (data.status == "warning") {
                 $.jGrowl('Warning: ' + data.reason, { group: 'alert-warning' });
@@ -155,12 +164,10 @@ function confirmModUpload(modSlug = null, modId = null, newMod = true) {
     
 }
 
-function createMod() {
-    //new mod. use slug from #name-new
-    modSlug = $('#name-new').val();
+function createMod(identifier) {
     //Map needed values
     createInfo = [];
-    createInfo = modInfos[modSlug];
+    createInfo = modInfos[identifier];
     $.ajax({
         type: "POST",
         url: "/mod/create",
@@ -170,7 +177,7 @@ function createMod() {
             if (data.status == "success") {
                 $.jGrowl('Created mod.', { group: 'alert-success' });
                 modId = data.data.id;
-                addVersion(modSlug,modId);
+                addVersion(identifier,createInfo['modid'],modId);
             } else if (data.status == "warning") {
                 $.jGrowl('Warning: ' + data.reason, { group: 'alert-warning' });
             } else {
@@ -183,15 +190,15 @@ function createMod() {
     });
 }
 
-function addVersion(modSlug = 0, modId = 0) {
-    //new version for mod with id "modid"
+function addVersion(identifier, modSlug = 0, modId = 0) {
     if (modSlug == 0) {
         modSlug = $('#name-new').val();
     }
     //Map needed values
-    modVersion = modInfos[modSlug]['version'];
-    mcVersion = modInfos[modSlug]['mcversion'];
-    loader = modInfos[modSlug]['loader'];
+    versionInfo = modInfos[identifier];
+    modVersion = versionInfo['version'];
+    mcVersion = versionInfo['mcversion'];
+    loader = versionInfo['loader'];
     $.ajax({
         type: "POST",
         url: "/mod/add-version",
@@ -200,7 +207,7 @@ function addVersion(modSlug = 0, modId = 0) {
             console.log(data);
             if (data.status == "success") {
                 $.jGrowl('Added version '+modVersion+" to "+modSlug, { group: 'alert-success' });
-                delete modInfos[modSlug];
+                delete versionInfo;
                 $('#modInfoModal').modal('hide');
                 redrawTable();
             } else if (data.status == "warning") {
@@ -215,12 +222,13 @@ function addVersion(modSlug = 0, modId = 0) {
     });
 }
 
-function cancelModUpload(modid = 0) {
-    if(modid == 0) {
-        modid = $('#cancelUploadButton').val();
+function cancelModUpload(identifier = null) {
+    //if not value is defined, it came from the form.
+    if (identifier == null) {
+        identifier = $('#modInfoArrayIdentifier').val();
     }
     //remove from list, redraw table.
-    delete modInfos[modid];
+    delete modInfos[identifier];
     $('#modInfoModal').modal('hide');
     redrawTable();
 }
@@ -232,7 +240,7 @@ $("#name").keyup(function() {
 });*/
 
 $('.changeSaveTrigger').keyup(function() {
-    updateMod();
+    updateMod(null);
 });
 
 $(document).ready(function() {
