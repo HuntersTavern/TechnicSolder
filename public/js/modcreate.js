@@ -207,7 +207,7 @@ function addVersion(identifier, modSlug = 0, modId = 0) {
             console.log(data);
             if (data.status == "success") {
                 $.jGrowl('Added version '+modVersion+" to "+modSlug, { group: 'alert-success' });
-                delete versionInfo;
+                delete modInfos[identifier];
                 $('#modInfoModal').modal('hide');
                 redrawTable();
             } else if (data.status == "warning") {
